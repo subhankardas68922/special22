@@ -1,0 +1,1927 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Instagram • Reels</title>
+  <link rel="icon" type="image/png" href="assets/favicon.webp" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#000000" />
+  <link rel="manifest" href="manifest.json" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Grand+Hotel&family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet" />
+
+  <style>
+    :root {
+      --font-family-system: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --ig-primary-background: #000000;
+      --ig-primary-text: #ffffff;
+      --ig-secondary-text: #a8a8a8;
+      --ig-stroke: #262626;
+      --ig-link: #0095f6;
+      --ig-red: #ff3040;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    :root {
+      --bottom-nav-height: 60px;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      background-color: #0d0d0d;
+      font-family: var(--font-family-system);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      user-select: none;
+    }
+
+    img {
+      -webkit-user-drag: none;
+      user-select: none;
+    }
+
+    /* Main Phone Shell */
+    .phone-container {
+      width: 100%;
+      height: 100vh;
+      height: 100dvh;
+      height: 100svh;
+      background-color: #000000;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      /* Safe area support for Android/iOS notch & nav bar */
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+    }
+
+    @media (min-width: 768px) {
+      .phone-container {
+        max-width: 430px;
+        height: 92vh;
+        max-height: 920px;
+        border-radius: 36px;
+        border: 8px solid #222222;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85);
+      }
+    }
+
+    /* Reels Top Header (Camera icon removed per request) */
+    .reels-header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: max(12px, env(safe-area-inset-top));
+      padding-bottom: 10px;
+      padding-left: max(16px, env(safe-area-inset-left));
+      padding-right: max(16px, env(safe-area-inset-right));
+      z-index: 50;
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0) 100%);
+      pointer-events: auto;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .back-btn {
+      background: none;
+      border: none;
+      color: #ffffff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+      text-decoration: none;
+    }
+
+    .reels-title {
+      color: #ffffff;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .reels-title svg {
+      transition: transform 0.2s ease;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .header-icon-btn {
+      background: none;
+      border: none;
+      color: #ffffff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+      transition: transform 0.15s ease;
+    }
+
+    .header-icon-btn:active {
+      transform: scale(0.9);
+    }
+
+    /* Reels Feed Container with Vertical Scroll Snapping */
+    .reels-feed {
+      flex: 1 1 0;
+      min-height: 0;
+      width: 100%;
+      overflow-y: scroll;
+      scroll-snap-type: y mandatory;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      position: relative;
+      background: #000000;
+      container-type: size;
+    }
+
+    .reels-feed::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* Individual Reel Item - fills the feed scroll area perfectly */
+    .reel-item {
+      width: 100%;
+      height: 100cqh;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+      position: relative;
+      overflow: hidden;
+      background: #000000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Video Player - Complete Contain Fit, no cropping */
+    .reel-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain !important;
+      background: #000000 !important;
+      z-index: 2;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    /* Contain fitting: preserves original video without cropping */
+    .reel-item.fit-contain .reel-video,
+    .reel-video.fit-contain {
+      object-fit: contain !important;
+      background: #000000 !important;
+    }
+
+    .reel-video.loaded {
+      opacity: 1;
+    }
+
+    /* Top & Bottom Shading for text contrast */
+    .reel-overlay-gradient {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      pointer-events: none;
+      background: linear-gradient(
+        180deg,
+        rgba(0, 0, 0, 0.4) 0%,
+        rgba(0, 0, 0, 0) 15%,
+        rgba(0, 0, 0, 0) 60%,
+        rgba(0, 0, 0, 0.45) 80%,
+        rgba(0, 0, 0, 0.88) 100%
+      );
+    }
+
+    /* Loading Spinner */
+    .reel-spinner {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.2s ease;
+    }
+
+    .reel-spinner.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .spinner-ring {
+      width: 38px;
+      height: 38px;
+      border: 3.5px solid rgba(255, 255, 255, 0.25);
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Mute Flash Badge (top-left, brief flash on mute toggle) */
+    .sound-badge {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.6);
+      width: 62px;
+      height: 62px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      z-index: 25;
+      pointer-events: none;
+      opacity: 0;
+      transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.25s ease;
+    }
+
+    .sound-badge.active {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    /* Persistent Pause Overlay — shown while video is paused */
+    .pause-play-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      z-index: 26;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.18s ease;
+    }
+
+    .pause-play-overlay.visible {
+      opacity: 1;
+    }
+
+    .pause-play-overlay svg {
+      margin-left: 4px; /* optical center for play icon */
+    }
+
+    /* Double Tap Heart Pop */
+    .double-tap-heart {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      width: 100px;
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 30;
+      filter: drop-shadow(0 4px 20px rgba(0, 0, 0, 0.6));
+      opacity: 0;
+    }
+
+    .double-tap-heart svg {
+      width: 100%;
+      height: 100%;
+      fill: #ffffff;
+    }
+
+    .double-tap-heart.animate-heart {
+      animation: instaHeartPop 0.85s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    @keyframes instaHeartPop {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0);
+      }
+      15% {
+        opacity: 0.95;
+        transform: translate(-50%, -50%) scale(1.2);
+      }
+      30% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(0.95);
+      }
+      45% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+      75% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1.25);
+      }
+    }
+
+    /* Right Action Bar (Instagram exact SVGs) */
+    .reel-actions-column {
+      position: absolute;
+      right: 12px;
+      bottom: 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+      z-index: 20;
+    }
+
+    .action-btn-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      color: #ffffff;
+    }
+
+    .action-icon-btn {
+      background: none;
+      border: none;
+      color: #ffffff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px;
+      filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.5));
+      transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .action-icon-btn:active {
+      transform: scale(1.2);
+    }
+
+    .action-label {
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 600;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+      letter-spacing: -0.1px;
+    }
+
+    /* Like Button Active */
+    .like-action-btn.liked svg {
+      fill: var(--ig-red) !important;
+      color: var(--ig-red) !important;
+      animation: likePop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes likePop {
+      0% {
+        transform: scale(1);
+      }
+      40% {
+        transform: scale(1.35);
+      }
+      70% {
+        transform: scale(0.9);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    /* Save Button Active */
+    .save-action-btn.saved svg polygon {
+      fill: #ffffff !important;
+    }
+
+    /* Music Album Disc */
+    .music-disc-wrap {
+      position: relative;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 2px solid #ffffff;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+      margin-top: 2px;
+    }
+
+    .music-disc-wrap img {
+      width: 100%;
+      height: 100%;
+      border-radius: 4px;
+      object-fit: cover;
+      display: block;
+      animation: discRotate 4s linear infinite;
+    }
+
+    @keyframes discRotate {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Bottom Left User Info & Caption Overlay */
+    .reel-meta-overlay {
+      position: absolute;
+      left: 14px;
+      right: 76px;
+      bottom: 18px;
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      color: #ffffff;
+      pointer-events: auto;
+    }
+
+    .reel-user-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .user-avatar-wrap {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      padding: 2px;
+      background: linear-gradient(
+        45deg,
+        #ffd600 0%,
+        #ffb300 12%,
+        #ff7a00 22%,
+        #ff3d3d 40%,
+        #ff006e 58%,
+        #d000ff 80%,
+        #ffd600 100%
+      );
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    .user-avatar-img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1.5px solid #000000;
+      display: block;
+    }
+
+    .user-name-text {
+      font-size: 14px;
+      font-weight: 600;
+      color: #ffffff;
+      cursor: pointer;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 220px;
+    }
+
+    /* Caption description */
+    .reel-caption-wrap {
+      font-size: 13.5px;
+      line-height: 1.45;
+      color: #ffffff;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+      padding-right: 10px;
+    }
+
+    .caption-text {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .caption-text.expanded {
+      display: block;
+      -webkit-line-clamp: unset;
+    }
+
+    .caption-more-btn {
+      color: #b3b3b3;
+      font-weight: 600;
+      cursor: pointer;
+      margin-left: 4px;
+    }
+
+    /* Bottom Video Progress Scrub Line */
+    .reel-progress-track {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2.5px;
+      background: rgba(255, 255, 255, 0.25);
+      z-index: 40;
+      cursor: pointer;
+    }
+
+    .reel-progress-fill {
+      height: 100%;
+      width: 0%;
+      background: #ffffff;
+      transition: width 0.1s linear;
+    }
+
+    /* Bottom Navigation Bar (Matched from main.html) */
+    .bottom-nav {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 10px 0;
+      padding-bottom: max(14px, env(safe-area-inset-bottom));
+      background: #000000;
+      border-top: 1px solid #1c1c1c;
+      z-index: 60;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .bottom-nav svg {
+      color: #ffffff;
+      cursor: pointer;
+      display: block;
+      transition: transform 0.15s ease;
+    }
+
+    .bottom-nav svg:active {
+      transform: scale(0.9);
+    }
+
+    .nav-avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1.5px solid #ffffff;
+    }
+
+    .nav-item-wrapper {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .nav-red-dot {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background-color: #ff3040;
+      border-radius: 50%;
+      border: 1.5px solid #000000;
+      right: -3.5px;
+      bottom: 2px;
+      pointer-events: none;
+    }
+    .nav-reels-active {
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .desktop-nav-hint {
+      display: none;
+      position: absolute;
+      right: -60px;
+      top: 50%;
+      transform: translateY(-50%);
+      flex-direction: column;
+      gap: 12px;
+      z-index: 100;
+    }
+
+    @media (min-width: 850px) {
+      .desktop-nav-hint {
+        display: flex;
+      }
+    }
+
+    .desktop-arrow-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #262626;
+      border: 1px solid #333333;
+      color: #ffffff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+      transition: background 0.2s ease, transform 0.15s ease;
+    }
+
+    .desktop-arrow-btn:hover {
+      background: #333333;
+      transform: scale(1.08);
+    }
+
+    .desktop-arrow-btn:active {
+      transform: scale(0.92);
+    }
+
+    /* Toast notification */
+    .toast-msg {
+      position: absolute;
+      bottom: 70px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: rgba(38, 38, 38, 0.92);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      color: #ffffff;
+      padding: 10px 18px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+      z-index: 200;
+      pointer-events: none;
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .toast-msg.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Bottom Sheet Modal (Comments, More Options) */
+    .bottom-sheet-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      z-index: 120;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .bottom-sheet-backdrop.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .bottom-sheet {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      max-height: 70%;
+      background: #1e1e1e;
+      border-radius: 18px 18px 0 0;
+      z-index: 130;
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+      display: flex;
+      flex-direction: column;
+      color: #ffffff;
+      overflow: hidden;
+    }
+
+    .bottom-sheet.active {
+      transform: translateY(0);
+    }
+
+    .sheet-handle {
+      width: 36px;
+      height: 4px;
+      background: #555555;
+      border-radius: 2px;
+      margin: 8px auto 6px;
+    }
+
+    .sheet-header {
+      padding: 10px 16px;
+      border-bottom: 1px solid #2d2d2d;
+      font-size: 15px;
+      font-weight: 700;
+      text-align: center;
+      position: relative;
+    }
+
+    .sheet-close-btn {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #a8a8a8;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .sheet-content {
+      padding: 16px;
+      overflow-y: auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .comment-item {
+      display: flex;
+      gap: 12px;
+      font-size: 13.5px;
+      align-items: flex-start;
+    }
+
+    .comment-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .comment-body {
+      flex: 1;
+      line-height: 1.45;
+    }
+
+    .comment-username {
+      font-weight: 600;
+      margin-right: 6px;
+      color: #ffffff;
+    }
+
+    .comment-text {
+      color: #eaeaea;
+    }
+
+    .comment-time {
+      font-size: 11px;
+      color: #888888;
+      margin-top: 4px;
+    }
+
+    .sheet-input-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      border-top: 1px solid #2d2d2d;
+      background: #181818;
+    }
+
+    .sheet-input {
+      flex: 1;
+      background: #2a2a2a;
+      border: 1px solid #3a3a3a;
+      border-radius: 20px;
+      color: #ffffff;
+      padding: 8px 14px;
+      font-size: 13.5px;
+      outline: none;
+    }
+
+    .sheet-send-btn {
+      background: none;
+      border: none;
+      color: var(--ig-link);
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      padding: 4px 8px;
+    }
+
+    .sheet-option-item {
+      padding: 12px 16px;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: background 0.15s ease;
+    }
+
+    .sheet-option-item:hover {
+      background: #2a2a2a;
+    }
+
+    .sheet-option-item.danger {
+      color: var(--ig-red);
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="phone-container">
+
+    <!-- Top Floating Header -->
+    <header class="reels-header">
+      <div class="header-left">
+        <a href="main.html" class="back-btn" aria-label="Go back to Home">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+        </a>
+        <span class="reels-title">Reels</span>
+      </div>
+
+      <div class="header-right">
+        <!-- Global Mute Toggle Button -->
+        <button class="header-icon-btn" id="globalMuteBtn" aria-label="Toggle Mute">
+          <!-- Muted icon — hidden by default (we start unmuted) -->
+          <svg id="headerMutedIcon" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
+            <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
+          </svg>
+          <!-- Unmuted/speaker icon — visible by default -->
+          <svg id="headerUnmutedIcon" width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Reels Vertical Scroll Feed -->
+    <main class="reels-feed" id="reelsFeed">
+      <!-- Dynamically generated by JS -->
+    </main>
+
+    <!-- Bottom Navigation Bar (Exact same layout & SVGs as in main.html) -->
+    <nav class="bottom-nav">
+      <!-- Home SVG -->
+      <a href="main.html" aria-label="Home" style="color: inherit; text-decoration: none;">
+        <svg aria-label="Home" fill="currentColor" height="24" role="img" viewBox="0 0 24 24" width="24">
+          <title>Home</title>
+          <path
+            d="m21.762 8.786-7-6.68a3.994 3.994 0 0 0-5.524 0l-7 6.681A4.017 4.017 0 0 0 1 11.68V19c0 2.206 1.794 4 4 4h3.005a1 1 0 0 0 1-1v-7.003a2.997 2.997 0 0 1 5.994 0V22a1 1 0 0 0 1 1H19c2.206 0 4-1.794 4-4v-7.32a4.02 4.02 0 0 0-1.238-2.894Z">
+          </path>
+        </svg>
+      </a>
+
+      <!-- Reels Active SVG -->
+      <a href="reel.html" aria-label="Reels" class="nav-reels-active" style="color: inherit; text-decoration: none;">
+        <svg aria-label="Reels" fill="currentColor" height="24" role="img" viewBox="0 0 24 24" width="24">
+          <title>Reels</title>
+          <path
+            d="M22.935 7.468c-.063-1.36-.307-2.142-.512-2.67a5.341 5.341 0 0 0-1.27-1.95 5.345 5.345 0 0 0-1.95-1.27c-.53-.206-1.311-.45-2.672-.513C15.333 1.012 14.976 1 12 1s-3.333.012-4.532.065c-1.36.063-2.142.307-2.67.512-.77.298-1.371.69-1.95 1.27a5.36 5.36 0 0 0-1.27 1.95c-.206.53-.45 1.311-.513 2.672C1.012 8.667 1 9.024 1 12s.012 3.333.065 4.532c.063 1.36.307 2.142.512 2.67.297.77.69 1.372 1.27 1.95.58.581 1.181.974 1.95 1.27.53.206 1.311.45 2.672.513C8.667 22.988 9.024 23 12 23s3.333-.012 4.532-.065c1.36-.063 2.142-.307 2.67-.512a5.33 5.33 0 0 0 1.95-1.27 5.356 5.356 0 0 0 1.27-1.95c.206-.53.45-1.311.513-2.672.053-1.198.065-1.555.065-4.531s-.012-3.333-.065-4.532Zm-1.998 8.972c-.05 1.07-.228 1.652-.38 2.04-.197.51-.434.874-.82 1.258a3.362 3.362 0 0 1-1.258.82c-.387.151-.97.33-2.038.379-1.162.052-1.51.063-4.441.063s-3.28-.01-4.44-.063c-1.07-.05-1.652-.228-2.04-.38a3.354 3.354 0 0 1-1.258-.82 3.362 3.362 0 0 1-.82-1.258c-.151-.387-.33-.97-.379-2.038C3.011 15.28 3 14.931 3 12s.01-3.28.063-4.44c.05-1.07.228-1.652.38-2.04.197-.51.434-.875.82-1.26a3.372 3.372 0 0 1 1.258-.819c.387-.15.97-.329 2.038-.378C8.72 3.011 9.069 3 12 3s3.28.01 4.44.063c1.07.05 1.652.228 2.04.38.51.197.874.433 1.258.82.385.382.622.747.82 1.258.151.387.33.97.379 2.038C20.989 8.72 21 9.069 21 12s-.01 3.28-.063 4.44Zm-4.584-6.828-5.25-3a2.725 2.725 0 0 0-2.745.01A2.722 2.722 0 0 0 6.988 9v6c0 .992.512 1.88 1.37 2.379.432.25.906.376 1.38.376.468 0 .937-.123 1.365-.367l5.25-3c.868-.496 1.385-1.389 1.385-2.388s-.517-1.892-1.385-2.388Zm-.993 3.04-5.25 3a.74.74 0 0 1-.748-.003.74.74 0 0 1-.374-.649V9a.74.74 0 0 1 .374-.65.737.737 0 0 1 .748-.002l5.25 3c.341.196.378.521.378.652s-.037.456-.378.651Z">
+          </path>
+        </svg>
+      </a>
+
+      <!-- Direct Messages -->
+      <a href="direct.html" class="nav-item-wrapper" aria-label="Direct Messages"
+        style="color: inherit; text-decoration: none;">
+        <svg class="action-icon" aria-label="Direct" width="24" height="24" viewBox="0 0 24 24" role="img">
+          <path
+            d="M13.973 20.046 21.77 6.928C22.8 5.195 21.55 3 19.535 3H4.466C2.138 3 .984 5.825 2.646 7.456l4.842 4.752 1.723 7.121c.548 2.266 3.571 2.721 4.762.717Z"
+            fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="2"></path>
+          <line fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            x1="7.488" x2="15.515" y1="12.208" y2="7.641"></line>
+        </svg>
+        <div class="nav-red-dot"></div>
+      </a>
+
+      <!-- Search -->
+      <a href="search.html" aria-label="Search" style="color: inherit; text-decoration: none;">
+        <svg aria-label="Search" fill="none" stroke="currentColor" stroke-width="2.2" height="24" role="img"
+          viewBox="0 0 24 24" width="24">
+          <title>Search</title>
+          <path d="M19 10.5A8.5 8.5 0 1 1 10.5 2a8.5 8.5 0 0 1 8.5 8.5Z"></path>
+          <line x1="16.5" y1="16.5" x2="22" y2="22" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" />
+        </svg>
+      </a>
+
+      <!-- Profile -->
+      <div class="nav-item-wrapper">
+        <img class="nav-avatar" src="https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/pfp.webp" alt="Profile" />
+        <div class="nav-red-dot"></div>
+      </div>
+    </nav>
+
+    <!-- Desktop Navigation Floating Arrow Buttons -->
+    <div class="desktop-nav-hint">
+      <button class="desktop-arrow-btn" id="prevReelDesktopBtn" aria-label="Previous Reel">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="18 15 12 9 6 15"></polyline>
+        </svg>
+      </button>
+      <button class="desktop-arrow-btn" id="nextReelDesktopBtn" aria-label="Next Reel">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Toast message popup -->
+    <div class="toast-msg" id="toastMsg">Link copied to clipboard</div>
+
+    <!-- Interactive Comments Sheet Modal (4 Romantic comments) -->
+    <div class="bottom-sheet-backdrop" id="commentsBackdrop" onclick="closeCommentsSheet()"></div>
+    <div class="bottom-sheet" id="commentsSheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-header">
+        <span>Comments</span>
+        <button class="sheet-close-btn" onclick="closeCommentsSheet()">&times;</button>
+      </div>
+      <div class="sheet-content" id="commentsList">
+        <!-- 4 Romantic Comments injected dynamically -->
+      </div>
+      <div class="sheet-input-row">
+        <input type="text" class="sheet-input" id="commentInput" placeholder="Add a comment..." />
+        <button class="sheet-send-btn" onclick="postNewComment()">Post</button>
+      </div>
+    </div>
+
+    <!-- More Options Sheet Modal -->
+    <div class="bottom-sheet-backdrop" id="optionsBackdrop" onclick="closeOptionsSheet()"></div>
+    <div class="bottom-sheet" id="optionsSheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-content">
+        <div class="sheet-option-item danger" onclick="showToast('Reported'); closeOptionsSheet();">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+          <span>Report</span>
+        </div>
+        <div class="sheet-option-item" onclick="showToast('Not interested'); closeOptionsSheet();">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+          <span>Not interested</span>
+        </div>
+        <div class="sheet-option-item" onclick="copyReelLink(); closeOptionsSheet();">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          <span>Copy link</span>
+        </div>
+        <div class="sheet-option-item" onclick="window.location.href='direct.html';">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13.973 20.046 21.77 6.928C22.8 5.195 21.55 3 19.535 3H4.466C2.138 3 .984 5.825 2.646 7.456l4.842 4.752 1.723 7.121c.548 2.266 3.571 2.721 4.762.717Z"/><line x1="7.488" y1="12.208" x2="15.515" y2="7.641"/></svg>
+          <span>Share to Direct</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+
+    const reelsData = [
+      {
+        id: 1,
+        videoUrl: "https://raw.githubusercontent.com/subhankardas68922/reel1/main/01.mp4",
+        username: "10.13_mine",
+        avatar: "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/10.13_mine.webp",
+        fit: "contain",
+        caption: "Every love story is beautiful, but ours is my absolute favorite 💖 Happy Girlfriend Day to my princess 🌸",
+        likes: "48.2K",
+        likesCount: 48200,
+        comments: "394",
+        reposts: "820",
+        shares: "8.9K",
+        saves: "4,120",
+        isLiked: false,
+        isSaved: false
+      },
+      {
+        id: 2,
+        videoUrl: "https://raw.githubusercontent.com/subhankardas68922/reel1/main/02.mp4",
+        username: "subhankar.das_",
+        avatar: "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/subhankar.das_.webp",
+        fit: "contain",
+        caption: "Even the moon fades in front of your beauty... Your gentle smile steals my heart every single day ✨❤️",
+        likes: "91.8K",
+        likesCount: 91800,
+        comments: "136",
+        reposts: "1,199",
+        shares: "14.4K",
+        saves: "7,862",
+        isLiked: false,
+        isSaved: false
+      },
+      
+      {
+        id: 3,
+        videoUrl: "https://raw.githubusercontent.com/subhankardas68922/reel1/main/03.mp4",
+        username: "youknowsamael",
+        avatar: "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/youknowsamael.webp",
+        fit: "contain",
+        caption: "Holding your hand and walking under the open sky... I never want this journey to end 🥰💫",
+        likes: "72.4K",
+        likesCount: 72400,
+        comments: "512",
+        reposts: "1,450",
+        shares: "11.2K",
+        saves: "6,930",
+        isLiked: false,
+        isSaved: false
+      },
+      {
+        id: 4,
+        videoUrl: "https://raw.githubusercontent.com/subhankardas68922/reel1/main/04.mp4",
+        username: "subhankar0724",
+        avatar: "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/subhankar0724.webp",
+        fit: "contain",
+        caption: "Your laughter is my favorite sound in the world ❤️ Always crazy, silly and hopelessly in love with you 💕",
+        likes: "124K",
+        likesCount: 124000,
+        comments: "882",
+        reposts: "3,110",
+        shares: "22.5K",
+        saves: "15.4K",
+        isLiked: false,
+        isSaved: false
+      },
+      {
+        id: 5,
+        videoUrl: "https://raw.githubusercontent.com/subhankardas68922/reel1/main/05.mp4",
+        username: "subhankar.das_",
+        avatar: "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/subhankar.das_.webp",
+        fit: "contain",
+        caption: "Sitting beside you, looking at the city lights, but my eyes will only ever be on you 🌃💘",
+        likes: "33.7K",
+        likesCount: 33700,
+        comments: "210",
+        reposts: "490",
+        shares: "5.1K",
+        saves: "2,840",
+        isLiked: false,
+        isSaved: false
+      },
+      {
+        id: 6,
+        videoUrl: "https://raw.githubusercontent.com/subhankardas68922/reel1/main/06.mp4",
+        username: "10.13_mine",
+        avatar: "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/10.13_mine.webp",
+        fit: "contain",
+        caption: "You are the sweetest part of my everyday life... My safe space, my peace and my whole heart 🌸✨",
+        likes: "158K",
+        likesCount: 158000,
+        comments: "1,420",
+        reposts: "4,600",
+        shares: "31.8K",
+        saves: "19.2K",
+        isLiked: false,
+        isSaved: false
+      },
+      {
+        id: 7,
+        videoUrl: "https://raw.githubusercontent.com/subhankardas68922/reel1/main/07.mp4",
+        username: "youknowsamael",
+        avatar: "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/youknowsamael.webp",
+        fit: "contain",
+        caption: "Little candid moments with you turn into forever memories 💖 I fall in love with you all over again every day 🌹",
+        likes: "610K",
+        likesCount: 610000,
+        comments: "5,820",
+        reposts: "18.3K",
+        shares: "88.2K",
+        saves: "45.1K",
+        isLiked: false,
+        isSaved: false
+      },
+      {
+        id: 8,
+        videoUrl: "https://raw.githubusercontent.com/subhankardas68922/reel1/main/05.mp4",
+        username: "subhankar0724",
+        avatar: "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/subhankar0724.webp",
+        fit: "contain",
+        caption: "No matter how busy life gets, one sweet look from you fixes everything 🥰 Thank you for being you ❤️",
+        likes: "215K",
+        likesCount: 215000,
+        comments: "1,890",
+        reposts: "3,890",
+        shares: "24.6K",
+        saves: "16.8K",
+        isLiked: false,
+        isSaved: false
+      },
+      {
+        id: 9,
+        videoUrl: "https://raw.githubusercontent.com/subhankardas68922/reel1/main/04.mp4",
+        username: "10.13_mine",
+        avatar: "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/10.13_mine.webp",
+        fit: "contain",
+        caption: "The world is full of wonders, but nothing compares to the sparkle in your eyes 💫 Love you endlessly 💕",
+        likes: "490K",
+        likesCount: 490000,
+        comments: "3,410",
+        reposts: "9,940",
+        shares: "64.2K",
+        saves: "38.7K",
+        isLiked: false,
+        isSaved: false
+      },
+      {
+        id: 10,
+        videoUrl: "https://raw.githubusercontent.com/subhankardas68922/reel1/main/01.mp4",
+        username: "subhankar.das_",
+        avatar: "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/subhankar.das_.webp",
+        fit: "contain",
+        caption: "Holding your hand tight and dreaming of our forever future together 💍💖 You are my home ✨",
+        likes: "89.5K",
+        likesCount: 89500,
+        comments: "640",
+        reposts: "1,520",
+        shares: "12.9K",
+        saves: "8,110",
+        isLiked: false,
+        isSaved: false
+      }
+    ];
+
+    /* 4 Romantic Comments from the requested 4 users */
+    const sampleComments = [
+      {
+        user: "subhankar.das_",
+        avatar: "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/subhankar.das_.webp",
+        text: "Every single second with you feels like a beautiful dream I never want to wake up from ❤️✨",
+        time: "2h ago"
+      },
+      {
+        user: "subhankar0724",
+        avatar: "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/subhankar0724.webp",
+        text: "That smile of yours melts my heart every single time 🥰 Forever my favorite view 💕",
+        time: "1h ago"
+      },
+      {
+        user: "10.13_mine",
+        avatar: "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/10.13_mine.webp",
+        text: "You are my whole world and my safest place in life 🌸 So lucky to have you 💖",
+        time: "45m ago"
+      },
+      {
+        user: "youknowsamael",
+        avatar: "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/youknowsamael.webp",
+        text: "No matter where we go, my heart will always belong to you 💫 Love you endlessly 💘",
+        time: "15m ago"
+      }
+    ];
+
+
+    const reelsFeed = document.getElementById("reelsFeed");
+    let currentActiveIndex = -1;
+    let isGlobalMuted = false; // Start unmuted — sound on by default
+    let isVideoPaused = false; // Track manual pause state
+
+    // Render DOM elements for all reels (NO fake poster image to avoid 1-sec flash)
+    function buildReelsDOM() {
+      reelsData.forEach((reel, index) => {
+        const item = document.createElement("section");
+        item.className = `reel-item ${reel.fit === "contain" ? "fit-contain" : ""}`;
+        item.dataset.index = index;
+
+        item.innerHTML = `
+          <!-- Video Element (src assigned dynamically in JS, no random poster flash) -->
+          <video class="reel-video ${reel.fit === "contain" ? "fit-contain" : ""}" playsinline loop preload="none"></video>
+
+          <!-- Persistent Pause/Play Overlay (shows while paused) -->
+          <div class="pause-play-overlay">
+            <svg width="24" height="24" viewBox="0 0 24 24" role="img" fill="currentColor">
+              <path d="M6.986 22.073a3.97 3.97 0 0 1-1.99-.54 3.938 3.938 0 0 1-1.99-3.445V5.912a3.94 3.94 0 0 1 1.99-3.445 3.937 3.937 0 0 1 3.98-.001L19.52 8.554c1.246.72 1.99 2.008 1.99 3.446s-.744 2.727-1.99 3.446L8.976 21.534a3.97 3.97 0 0 1-1.99.54Z"/>
+            </svg>
+          </div>
+
+          <!-- Loading Spinner -->
+          <div class="reel-spinner">
+            <div class="spinner-ring"></div>
+          </div>
+
+          <!-- Subtle Lighting Gradient Overlays -->
+          <div class="reel-overlay-gradient"></div>
+
+          <!-- Center Sound & Play feedback badge -->
+          <div class="sound-badge">
+            <svg class="sound-icon-muted" width="34" height="34" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
+            </svg>
+            <svg class="sound-icon-unmuted" width="34" height="34" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
+              <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+            </svg>
+          </div>
+
+          <!-- Double Tap Animated Heart -->
+          <div class="double-tap-heart">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
+          </div>
+
+          <!-- Right Action Bar (Instagram exact SVGs) -->
+          <div class="reel-actions-column">
+            <!-- Like Button -->
+            <div class="action-btn-wrap" onclick="toggleReelLike(${index}, this)">
+              <button class="action-icon-btn like-action-btn ${reel.isLiked ? 'liked' : ''}" aria-label="Like">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M16.792 3.904A4.989 4.989 0 0 1 21.5 9.122c0 3.072-2.652 4.959-5.197 7.222-2.512 2.243-3.865 3.469-4.303 3.752-.477-.309-2.143-1.823-4.303-3.752C5.141 14.072 2.5 12.167 2.5 9.122a4.989 4.989 0 0 1 4.708-5.218 4.21 4.21 0 0 1 3.675 1.941c.84 1.175.98 1.763 1.12 1.763s.278-.588 1.11-1.766a4.17 4.17 0 0 1 3.679-1.938m0-2a6.04 6.04 0 0 0-4.797 2.127 6.052 6.052 0 0 0-4.787-2.127A6.985 6.985 0 0 0 .5 9.122c0 3.61 2.55 5.827 5.015 7.97.283.246.569.494.853.747l1.027.918a44.998 44.998 0 0 0 3.518 3.018 2 2 0 0 0 2.174 0 45.263 45.263 0 0 0 3.626-3.115l.922-.824c.293-.26.59-.519.885-.774 2.334-2.025 4.98-4.32 4.98-7.94a6.985 6.985 0 0 0-6.708-7.218Z"/>
+                </svg>
+              </button>
+              <span class="action-label like-count-label">${reel.likes}</span>
+            </div>
+
+            <!-- Comment Button -->
+            <div class="action-btn-wrap" onclick="openCommentsSheet(${index})">
+              <button class="action-icon-btn" aria-label="Comments">
+                <svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linejoin="round">
+                  <path d="M20.656 17.008a9.993 9.993 0 1 0-3.59 3.615L22 22Z"/>
+                </svg>
+              </button>
+              <span class="action-label comment-count-label">${reel.comments}</span>
+            </div>
+
+            <!-- Remix / Repost Button -->
+            <div class="action-btn-wrap" onclick="handleRemix(${index})">
+              <button class="action-icon-btn" aria-label="Repost">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="17 1 21 5 17 9"></polyline>
+                  <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+                  <polyline points="7 23 3 19 7 15"></polyline>
+                  <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+                </svg>
+              </button>
+              <span class="action-label">${reel.reposts}</span>
+            </div>
+
+            <!-- Share Button -->
+            <div class="action-btn-wrap" onclick="handleShare(${index})">
+              <button class="action-icon-btn" aria-label="Share">
+                <svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="2">
+                  <path d="M13.973 20.046 21.77 6.928C22.8 5.195 21.55 3 19.535 3H4.466C2.138 3 .984 5.825 2.646 7.456l4.842 4.752 1.723 7.121c.548 2.266 3.571 2.721 4.762.717Z"/>
+                  <line stroke-linecap="round" x1="7.488" x2="15.515" y1="12.208" y2="7.641"></line>
+                </svg>
+              </button>
+              <span class="action-label">${reel.shares}</span>
+            </div>
+
+            <!-- Bookmark / Save Button -->
+            <div class="action-btn-wrap" onclick="toggleReelSave(${index}, this)">
+              <button class="action-icon-btn save-action-btn ${reel.isSaved ? 'saved' : ''}" aria-label="Save">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon fill="none" points="20 21 12 13.44 4 21 4 3 20 3 20 21" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+                </svg>
+              </button>
+              <span class="action-label save-count-label">${reel.saves}</span>
+            </div>
+
+            <!-- More Options Button -->
+            <div class="action-btn-wrap" onclick="openOptionsSheet(${index})">
+              <button class="action-icon-btn" aria-label="Options">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                  <circle cx="12" cy="6" r="2"/>
+                  <circle cx="12" cy="12" r="2"/>
+                  <circle cx="12" cy="18" r="2"/>
+                </svg>
+              </button>
+            </div>
+
+            <!-- Rotating User Avatar Disc -->
+            <div class="music-disc-wrap" onclick="showToast('@${reel.username}')">
+              <img src="${reel.avatar}" alt="${reel.username}" />
+            </div>
+          </div>
+
+          <!-- Bottom Left Metadata Overlay (Follow button & Song row removed) -->
+          <div class="reel-meta-overlay">
+            <!-- Profile Row -->
+            <div class="reel-user-row">
+              <div class="user-avatar-wrap">
+                <img class="user-avatar-img" src="${reel.avatar}" alt="${reel.username}" />
+              </div>
+              <span class="user-name-text">${reel.username}</span>
+            </div>
+
+            <!-- Caption description -->
+            <div class="reel-caption-wrap">
+              <span class="caption-text" id="caption-${index}">${reel.caption}</span>
+              <span class="caption-more-btn" onclick="toggleCaptionExpand(${index}, this)">more</span>
+            </div>
+          </div>
+
+          <!-- Live Video Progress Bar at the very bottom -->
+          <div class="reel-progress-track" onclick="handleProgressSeek(event, ${index})">
+            <div class="reel-progress-fill"></div>
+          </div>
+        `;
+
+        bindTapEvents(item, index);
+        reelsFeed.appendChild(item);
+      });
+    }
+
+    /* Bind tap / double-tap events to reel items */
+    function bindTapEvents(itemEl, index) {
+      let lastTapTime = 0;
+      let tapTimeout = null;
+
+      itemEl.addEventListener("click", (e) => {
+        if (e.target.closest("button") || e.target.closest(".action-btn-wrap") || e.target.closest(".music-disc-wrap") || e.target.closest(".reel-progress-track") || e.target.closest(".caption-more-btn")) {
+          return;
+        }
+
+        const currentTime = new Date().getTime();
+        const tapGap = currentTime - lastTapTime;
+
+        if (tapGap < 300 && tapGap > 0) {
+          // Double tap → like heart animation
+          clearTimeout(tapTimeout);
+          triggerDoubleTapHeart(itemEl, index);
+        } else {
+          // Single tap → pause / play
+          tapTimeout = setTimeout(() => {
+            togglePausePlay(index);
+          }, 300);
+        }
+        lastTapTime = currentTime;
+      });
+    }
+
+    /* Trigger Instagram Heart Pop on Double Tap */
+    function triggerDoubleTapHeart(itemEl, index) {
+      const heartEl = itemEl.querySelector(".double-tap-heart");
+      if (heartEl) {
+        heartEl.classList.remove("animate-heart");
+        void heartEl.offsetWidth;
+        heartEl.classList.add("animate-heart");
+      }
+
+      const reel = reelsData[index];
+      if (!reel.isLiked) {
+        const likeBtnWrap = itemEl.querySelector(".action-btn-wrap");
+        toggleReelLike(index, likeBtnWrap);
+      }
+    }
+
+    /* Toggle Pause / Play on single tap — shows persistent play icon while paused */
+    function togglePausePlay(index) {
+      const itemEl = document.querySelector(`.reel-item[data-index="${index}"]`);
+      if (!itemEl) return;
+      const video = itemEl.querySelector(".reel-video");
+      const overlay = itemEl.querySelector(".pause-play-overlay");
+      if (!video) return;
+
+      if (video.paused) {
+        video.play().catch(() => {});
+        isVideoPaused = false;
+        if (overlay) overlay.classList.remove("visible");
+      } else {
+        video.pause();
+        isVideoPaused = true;
+        if (overlay) overlay.classList.add("visible");
+      }
+    }
+
+    /* Toggle Mute / Unmute — only via header button, shows brief flash badge */
+    function toggleMuteOrPlay(index) {
+      isGlobalMuted = !isGlobalMuted;
+      updateGlobalAudioState();
+
+      const itemEl = document.querySelector(`.reel-item[data-index="${index}"]`);
+      if (itemEl) {
+        const badge = itemEl.querySelector(".sound-badge");
+        const mutedIcon = badge.querySelector(".sound-icon-muted");
+        const unmutedIcon = badge.querySelector(".sound-icon-unmuted");
+
+        if (isGlobalMuted) {
+          mutedIcon.style.display = "block";
+          unmutedIcon.style.display = "none";
+        } else {
+          mutedIcon.style.display = "none";
+          unmutedIcon.style.display = "block";
+        }
+
+        badge.classList.remove("active");
+        void badge.offsetWidth;
+        badge.classList.add("active");
+        setTimeout(() => {
+          badge.classList.remove("active");
+        }, 850);
+      }
+    }
+
+    function updateGlobalAudioState() {
+      document.querySelectorAll(".reel-video").forEach((vid) => {
+        vid.muted = isGlobalMuted;
+      });
+
+      const hMuted = document.getElementById("headerMutedIcon");
+      const hUnmuted = document.getElementById("headerUnmutedIcon");
+      if (isGlobalMuted) {
+        hMuted.style.display = "block";
+        hUnmuted.style.display = "none";
+      } else {
+        hMuted.style.display = "none";
+        hUnmuted.style.display = "block";
+      }
+    }
+
+    document.getElementById("globalMuteBtn").addEventListener("click", () => {
+      toggleMuteOrPlay(currentActiveIndex >= 0 ? currentActiveIndex : 0);
+    });
+
+    /* ==========================================================================
+       CORE REEL LOADING & MEMORY MANAGEMENT CONTROLLER
+       ========================================================================== */
+
+    function activateReel(index) {
+      // Wrap-around for infinite loop
+      index = ((index % reelsData.length) + reelsData.length) % reelsData.length;
+      if (currentActiveIndex === index) return;
+
+      const previousIndex = currentActiveIndex;
+      currentActiveIndex = index;
+
+      // 1. Pause previous video
+      if (previousIndex !== -1 && previousIndex !== index) {
+        const prevItem = document.querySelector(`.reel-item[data-index="${previousIndex}"]`);
+        if (prevItem) {
+          const prevVideo = prevItem.querySelector(".reel-video");
+          if (prevVideo) {
+            prevVideo.pause();
+          }
+        }
+      }
+
+      // 2. Load and Play newly visible video
+      const currentItem = document.querySelector(`.reel-item[data-index="${index}"]`);
+      if (currentItem) {
+        const video = currentItem.querySelector(".reel-video");
+        const spinner = currentItem.querySelector(".reel-spinner");
+        const fill = currentItem.querySelector(".reel-progress-fill");
+        const reel = reelsData[index];
+
+        // Every video is completely and cleanly fitted without any cropping
+        video.style.objectFit = "contain";
+        video.classList.add("fit-contain");
+        currentItem.classList.add("fit-contain");
+
+        // Dynamically assign video source
+        if (!video.src || video.src === "" || video.src === window.location.href) {
+          spinner.classList.remove("hidden");
+          video.src = reel.videoUrl;
+          video.preload = "auto";
+          video.load();
+        }
+
+        video.muted = isGlobalMuted;
+
+        // Hide pause overlay when activating a new reel
+        const overlay = currentItem.querySelector(".pause-play-overlay");
+        if (overlay) overlay.classList.remove("visible");
+        isVideoPaused = false;
+
+        // Play video smoothly
+        const playPromise = video.play();
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => {
+              video.classList.add("loaded");
+              spinner.classList.add("hidden");
+            })
+            .catch(() => {
+              video.muted = true;
+              video.play()
+                .then(() => {
+                  video.classList.add("loaded");
+                  spinner.classList.add("hidden");
+                 
+                  video.muted = isGlobalMuted;
+                })
+                .catch(() => {});
+            });
+        }
+
+        video.onwaiting = () => spinner.classList.remove("hidden");
+        video.oncanplay = () => {
+          spinner.classList.add("hidden");
+          video.classList.add("loaded");
+        };
+        video.onplaying = () => {
+          spinner.classList.add("hidden");
+          video.classList.add("loaded");
+        };
+
+        video.ontimeupdate = () => {
+          if (video.duration && !isNaN(video.duration)) {
+            const percent = (video.currentTime / video.duration) * 100;
+            fill.style.width = `${percent}%`;
+          }
+        };
+      }
+
+      preloadReel(index + 1);
+
+      unloadFarReels(index);
+    }
+
+    function preloadReel(nextIndex) {
+      if (nextIndex < 0 || nextIndex >= reelsData.length) return;
+
+      const nextItem = document.querySelector(`.reel-item[data-index="${nextIndex}"]`);
+      if (nextItem) {
+        const video = nextItem.querySelector(".reel-video");
+        const nextReel = reelsData[nextIndex];
+        video.style.objectFit = "contain";
+        video.classList.add("fit-contain");
+        nextItem.classList.add("fit-contain");
+        if (!video.src || video.src === "" || video.src === window.location.href) {
+          video.src = nextReel.videoUrl;
+          video.preload = "auto";
+          video.load();
+        }
+      }
+    }
+
+    function unloadFarReels(activeIndex) {
+      reelsData.forEach((_, idx) => {
+        const distance = Math.abs(idx - activeIndex);
+        if (distance > 1) {
+          const item = document.querySelector(`.reel-item[data-index="${idx}"]`);
+          if (item) {
+            const video = item.querySelector(".reel-video");
+            const spinner = item.querySelector(".reel-spinner");
+            if (video && video.src && video.src !== "") {
+              video.pause();
+              video.removeAttribute("src");
+              video.load();
+              video.classList.remove("loaded");
+              if (spinner) spinner.classList.add("hidden");
+            }
+          }
+        }
+      });
+    }
+
+    function handleProgressSeek(e, index) {
+      e.stopPropagation();
+      const track = e.currentTarget;
+      const rect = track.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const percent = Math.max(0, Math.min(1, clickX / rect.width));
+
+      const item = document.querySelector(`.reel-item[data-index="${index}"]`);
+      if (item) {
+        const video = item.querySelector(".reel-video");
+        if (video && video.duration) {
+          video.currentTime = percent * video.duration;
+        }
+      }
+    }
+
+
+    function setupIntersectionObserver() {
+      const options = {
+        root: reelsFeed,
+        threshold: 0.65
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const index = parseInt(entry.target.dataset.index, 10);
+            activateReel(index);
+          }
+        });
+      }, options);
+
+      document.querySelectorAll(".reel-item").forEach((item) => {
+        observer.observe(item);
+      });
+    }
+
+    /* ==========================================================================
+       USER INTERACTION HANDLERS (LIKE, SAVE, SHEETS, ETC.)
+       ========================================================================== */
+
+    const OUTLINE_HEART = `
+      <path d="M16.792 3.904A4.989 4.989 0 0 1 21.5 9.122c0 3.072-2.652 4.959-5.197 7.222-2.512 2.243-3.865 3.469-4.303 3.752-.477-.309-2.143-1.823-4.303-3.752C5.141 14.072 2.5 12.167 2.5 9.122a4.989 4.989 0 0 1 4.708-5.218 4.21 4.21 0 0 1 3.675 1.941c.84 1.175.98 1.763 1.12 1.763s.278-.588 1.11-1.766a4.17 4.17 0 0 1 3.679-1.938m0-2a6.04 6.04 0 0 0-4.797 2.127 6.052 6.052 0 0 0-4.787-2.127A6.985 6.985 0 0 0 .5 9.122c0 3.61 2.55 5.827 5.015 7.97.283.246.569.494.853.747l1.027.918a44.998 44.998 0 0 0 3.518 3.018 2 2 0 0 0 2.174 0 45.263 45.263 0 0 0 3.626-3.115l.922-.824c.293-.26.59-.519.885-.774 2.334-2.025 4.98-4.32 4.98-7.94a6.985 6.985 0 0 0-6.708-7.218Z"/>
+    `;
+    const FILLED_HEART = `
+      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+    `;
+
+    function toggleReelLike(index, wrapEl) {
+      const reel = reelsData[index];
+      reel.isLiked = !reel.isLiked;
+
+      const btn = wrapEl.querySelector(".like-action-btn");
+      const label = wrapEl.querySelector(".like-count-label");
+      const svg = btn.querySelector("svg");
+
+      if (reel.isLiked) {
+        btn.classList.add("liked");
+        svg.innerHTML = FILLED_HEART;
+        reel.likesCount += 1;
+      } else {
+        btn.classList.remove("liked");
+        svg.innerHTML = OUTLINE_HEART;
+        reel.likesCount -= 1;
+      }
+
+      label.textContent = formatCount(reel.likesCount);
+    }
+
+    function toggleReelSave(index, wrapEl) {
+      const reel = reelsData[index];
+      reel.isSaved = !reel.isSaved;
+
+      const btn = wrapEl.querySelector(".save-action-btn");
+      if (reel.isSaved) {
+        btn.classList.add("saved");
+        showToast("Saved to your collection");
+      } else {
+        btn.classList.remove("saved");
+        showToast("Removed from saved");
+      }
+    }
+
+    function toggleCaptionExpand(index, moreBtn) {
+      const textEl = document.getElementById(`caption-${index}`);
+      if (textEl) {
+        textEl.classList.toggle("expanded");
+        moreBtn.textContent = textEl.classList.contains("expanded") ? "less" : "more";
+      }
+    }
+
+    function handleRemix(index) {
+      showToast(`Remixing reel from @${reelsData[index].username}`);
+    }
+
+    function handleShare(index) {
+      window.location.href = "direct.html";
+    }
+
+    function formatCount(num) {
+      if (num >= 1000000) return (num / 1000000).toFixed(1) + "M";
+      if (num >= 1000) return (num / 1000).toFixed(1) + "K";
+      return num.toString();
+    }
+
+    /* Toast Helper */
+    let toastTimeout = null;
+    function showToast(msg) {
+      const toast = document.getElementById("toastMsg");
+      toast.textContent = msg;
+      toast.classList.add("show");
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove("show");
+      }, 2400);
+    }
+
+    function copyReelLink() {
+      navigator.clipboard?.writeText(window.location.href);
+      showToast("Link copied to clipboard");
+    }
+
+    /* Comments Sheet */
+    let activeCommentReelIndex = 0;
+    function openCommentsSheet(index) {
+      activeCommentReelIndex = index;
+      const sheet = document.getElementById("commentsSheet");
+      const backdrop = document.getElementById("commentsBackdrop");
+      const list = document.getElementById("commentsList");
+
+      list.innerHTML = "";
+      sampleComments.forEach((c) => {
+        const div = document.createElement("div");
+        div.className = "comment-item";
+        div.innerHTML = `
+          <img class="comment-avatar" src="${c.avatar}" onerror="this.src='https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/pfp.webp'" alt="${c.user}" />
+          <div class="comment-body">
+            <div>
+              <span class="comment-username">${c.user}</span>
+              <span class="comment-text">${c.text}</span>
+            </div>
+            <div class="comment-time">${c.time}</div>
+          </div>
+        `;
+        list.appendChild(div);
+      });
+
+      backdrop.classList.add("active");
+      sheet.classList.add("active");
+    }
+
+    function closeCommentsSheet() {
+      document.getElementById("commentsSheet").classList.remove("active");
+      document.getElementById("commentsBackdrop").classList.remove("active");
+    }
+
+    function postNewComment() {
+      const input = document.getElementById("commentInput");
+      const text = input.value.trim();
+      if (!text) return;
+
+      const list = document.getElementById("commentsList");
+      const div = document.createElement("div");
+      div.className = "comment-item";
+      div.innerHTML = `
+        <img class="comment-avatar" src="https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/pfp.webp" alt="You" />
+        <div class="comment-body">
+          <div>
+            <span class="comment-username">you</span>
+            <span class="comment-text">${text}</span>
+          </div>
+          <div class="comment-time">Just now</div>
+        </div>
+      `;
+      list.appendChild(div);
+      input.value = "";
+      showToast("Comment posted");
+
+      const item = document.querySelector(`.reel-item[data-index="${activeCommentReelIndex}"]`);
+      if (item) {
+        const label = item.querySelector(".comment-count-label");
+        const currentCount = parseInt(reelsData[activeCommentReelIndex].comments, 10) || 136;
+        reelsData[activeCommentReelIndex].comments = (currentCount + 1).toString();
+        label.textContent = reelsData[activeCommentReelIndex].comments;
+      }
+    }
+
+    /* Options Sheet */
+    function openOptionsSheet(index) {
+      document.getElementById("optionsBackdrop").classList.add("active");
+      document.getElementById("optionsSheet").classList.add("active");
+    }
+
+    function closeOptionsSheet() {
+      document.getElementById("optionsBackdrop").classList.remove("active");
+      document.getElementById("optionsSheet").classList.remove("active");
+    }
+
+
+    function scrollToReel(index) {
+      // Loop: wrap around both ends
+      if (index < 0) index = reelsData.length - 1;
+      if (index >= reelsData.length) index = 0;
+
+      const target = document.querySelector(`.reel-item[data-index="${index}"]`);
+      if (target) {
+        // For looping to first, instant jump (no smooth scroll jarring effect)
+        const behavior = (index === 0 && currentActiveIndex === reelsData.length - 1) ? "instant" : "smooth";
+        reelsFeed.scrollTo({ top: target.offsetTop, behavior });
+      }
+    }
+
+    document.getElementById("prevReelDesktopBtn").addEventListener("click", () => {
+      scrollToReel(currentActiveIndex - 1);
+    });
+
+    document.getElementById("nextReelDesktopBtn").addEventListener("click", () => {
+      scrollToReel(currentActiveIndex + 1);
+    });
+
+    window.addEventListener("keydown", (e) => {
+      if (e.target.tagName === "INPUT") return;
+
+      if (e.key === "ArrowDown" || e.key === "PageDown") {
+        e.preventDefault();
+        scrollToReel(currentActiveIndex + 1);
+      } else if (e.key === "ArrowUp" || e.key === "PageUp") {
+        e.preventDefault();
+        scrollToReel(currentActiveIndex - 1);
+      } else if (e.key === " ") {
+        e.preventDefault();
+        const curItem = document.querySelector(`.reel-item[data-index="${currentActiveIndex}"]`);
+        if (curItem) {
+          const video = curItem.querySelector(".reel-video");
+          if (video) {
+            if (video.paused) video.play();
+            else video.pause();
+          }
+        }
+      } else if (e.key === "m" || e.key === "M") {
+        toggleMuteOrPlay(currentActiveIndex);
+      }
+    });
+    
+    let _touchStartY = 0;
+    let _isLooping = false;   
+
+    function loopToFirst() {
+      if (_isLooping) return;
+      _isLooping = true;
+      reelsFeed.scrollTo({ top: 0, behavior: "instant" });
+      currentActiveIndex = -1;
+      activateReel(0);
+      setTimeout(() => { _isLooping = false; }, 400);
+    }
+
+    function loopToLast() {
+      if (_isLooping) return;
+      _isLooping = true;
+      const lastItem = document.querySelector(`.reel-item[data-index="${reelsData.length - 1}"]`);
+      if (lastItem) {
+        reelsFeed.scrollTo({ top: lastItem.offsetTop, behavior: "instant" });
+        currentActiveIndex = -1;
+        activateReel(reelsData.length - 1);
+      }
+      setTimeout(() => { _isLooping = false; }, 400);
+    }
+
+    reelsFeed.addEventListener("touchstart", (e) => {
+      _touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+
+    reelsFeed.addEventListener("touchend", (e) => {
+      if (_isLooping) return;
+      const deltaY = _touchStartY - e.changedTouches[0].clientY;
+
+      if (deltaY > 30 && currentActiveIndex === reelsData.length - 1) {
+        loopToFirst();
+      } else if (deltaY < -30 && currentActiveIndex === 0) {
+        loopToLast();
+      }
+    }, { passive: true });
+
+    // ── Scroll: catches slow drags & scroll-snap boundary hits 3───
+    reelsFeed.addEventListener("scroll", () => {
+      if (_isLooping) return;
+
+      const scrollTop   = reelsFeed.scrollTop;
+      const scrollMax   = reelsFeed.scrollHeight - reelsFeed.clientHeight;
+
+      // Reached absolute bottom while on last reel → loop to first
+      if (scrollTop >= scrollMax - 5 && currentActiveIndex === reelsData.length - 1) {
+        loopToFirst();
+      }
+      // Reached absolute top while on first reel → loop to last
+      else if (scrollTop <= 5 && currentActiveIndex === reelsData.length - 1) {
+        // This case: jumped to top already (after loopToFirst), skip
+      }
+    }, { passive: true });
+
+    document.addEventListener("DOMContentLoaded", () => {
+      buildReelsDOM();
+      setupIntersectionObserver();
+    });
+
+    // ─── Android Hardware Back Button Fix ───────────────────────────────────
+    history.pushState({ page: 'reels' }, '', window.location.href);
+    window.addEventListener('popstate', function () {
+      history.pushState({ page: 'reels' }, '', window.location.href);
+    });
+  </script>
+</body>
+
+</html>

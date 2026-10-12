@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>Instagram</title>
+    <link rel="icon" type="image/png" href="assets/favicon.webp" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <style>
+        :root {
+            --ig-primary-blue: #0064e0;
+            --ig-primary-button-hover: #0056c6;
+            --ig-primary-text: #000000;
+            --ig-secondary-text: #737373;
+            --ig-border-color: #dadde1;
+            --ig-bg: #ffffff;
+            --ig-input-bg: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #0d0d0d;
+            color: var(--ig-primary-text);
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Mobile Screen Container */
+        .app-screen {
+            width: 100%;
+            height: 100vh;
+            height: 100dvh;
+            height: 100svh;
+            max-width: 100%;
+            background-color: var(--ig-bg);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            /* Safe area for Android/iOS - top notch & side edges */
+            padding: 16px 18px 20px;
+            padding-top: max(16px, env(safe-area-inset-top));
+            padding-left: max(18px, env(safe-area-inset-left));
+            padding-right: max(18px, env(safe-area-inset-right));
+            /* Bottom padding handled by bottom-section */
+            padding-bottom: max(20px, env(safe-area-inset-bottom));
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        @media (min-width: 768px) {
+            body {
+                background-color: #121212;
+            }
+
+            .app-screen {
+                max-width: 412px;
+                height: 860px;
+                max-height: 94vh;
+                border-radius: 36px;
+                border: 8px solid #262626;
+                box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+                padding: 18px 22px 22px;
+            }
+        }
+
+        /* Top Back Arrow (Row 1) */
+        .top-nav {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            height: 32px;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            margin-left: -4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000000;
+            border-radius: 50%;
+            transition: background-color 0.15s ease;
+        }
+
+        .back-btn:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .back-btn svg {
+            width: 22px;
+            height: 22px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .language-row {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 14px;
+        }
+
+        .language-selector-wrap {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 8px;
+            transition: background-color 0.15s ease;
+        }
+
+        .language-selector-wrap:hover {
+            background-color: rgba(0, 0, 0, 0.04);
+        }
+
+        .language-text {
+            font-size: 13.5px;
+            color: var(--ig-secondary-text);
+            font-weight: 400;
+            letter-spacing: -0.1px;
+        }
+
+        .language-selector-wrap svg {
+            width: 13px;
+            height: 13px;
+            color: var(--ig-secondary-text);
+            stroke-width: 2.2;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            margin-top: 70px;
+        }
+
+        .ig-logo-container {
+            margin-bottom: 90px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 64px;
+        }
+
+        .ig-logo-container i {
+            transform: scale(0.66);
+            transform-origin: center center;
+            display: inline-block;
+        }
+
+        .login-form {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .field-group {
+            position: relative;
+            width: 100%;
+            background: var(--ig-input-bg);
+            border: 1px solid var(--ig-border-color);
+            border-radius: 14px;
+            transition: border-color 0.2s ease;
+            height: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 9px 16px;
+            margin-bottom: 10px;
+        }
+
+        .field-group:focus-within {
+            border-color: #8c939d;
+        }
+
+        .field-label {
+            font-size: 12px;
+            color: var(--ig-secondary-text);
+            font-weight: 400;
+            line-height: 1.2;
+            transition: all 0.15s ease;
+            pointer-events: none;
+            user-select: none;
+            letter-spacing: -0.1px;
+        }
+
+        .field-input {
+            width: 100%;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-family: inherit;
+            font-size: 15.5px;
+            color: #000000;
+            font-weight: 400;
+            padding-top: 2px;
+        }
+
+        .field-input::placeholder {
+            color: transparent;
+        }
+
+        .field-group.is-empty:not(:focus-within) .field-label {
+            transform: translateY(9px);
+            font-size: 14.5px;
+            color: var(--ig-secondary-text);
+        }
+
+        .field-group.is-empty:not(:focus-within) .field-input {
+            opacity: 0;
+        }
+
+        .password-toggle-btn {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 6px;
+            color: var(--ig-secondary-text);
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .password-toggle-btn.visible {
+            display: flex;
+        }
+
+        .login-btn {
+            margin-top: 4px;
+            width: 100%;
+            height: 44px;
+            background-color: var(--ig-primary-blue);
+            color: #ffffff;
+            border: none;
+            border-radius: 100px;
+            font-family: inherit;
+            font-size: 14.5px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s ease, opacity 0.2s ease, transform 0.1s active;
+        }
+
+        .login-btn:hover {
+            background-color: var(--ig-primary-button-hover);
+        }
+
+        .login-btn:active {
+            transform: scale(0.985);
+        }
+
+        .login-btn.loading {
+            pointer-events: none;
+            opacity: 0.85;
+        }
+
+        .spinner {
+            display: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            border-top-color: #ffffff;
+            animation: spin 0.75s linear infinite;
+        }
+
+        .login-btn.loading .spinner {
+            display: block;
+        }
+
+        .login-btn.loading .btn-text {
+            display: none;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .forgot-password-link {
+            margin-top: 20px;
+            color: #000000;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            text-align: center;
+            cursor: pointer;
+            transition: opacity 0.15s ease;
+        }
+
+        .forgot-password-link:hover {
+            opacity: 0.7;
+        }
+
+        .bottom-section {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: auto;
+            padding-top: 32px;
+            padding-bottom: 4px;
+        }
+
+        .create-account-btn {
+            width: 100%;
+            height: 44px;
+            background-color: transparent;
+            color: var(--ig-primary-blue);
+            border: 1.2px solid var(--ig-primary-blue);
+            border-radius: 100px;
+            font-family: inherit;
+            font-size: 14.5px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: background-color 0.15s ease, transform 0.1s active;
+        }
+
+        .create-account-btn:hover {
+            background-color: rgba(0, 100, 224, 0.04);
+        }
+
+        .create-account-btn:active {
+            transform: scale(0.985);
+        }
+
+        .meta-branding {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 58px;
+            height: 13px;
+            cursor: pointer;
+            user-select: none;
+            opacity: 0.9;
+            margin-top: 22px;
+            transition: opacity 0.15s ease;
+        }
+
+        .meta-branding:hover {
+            opacity: 1;
+        }
+
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            z-index: 100;
+            align-items: flex-end;
+            justify-content: center;
+            backdrop-filter: blur(2px);
+        }
+
+        .modal-backdrop.active {
+            display: flex;
+        }
+
+        .modal-sheet {
+            background: #ffffff;
+            width: 100%;
+            max-width: 412px;
+            border-radius: 20px 20px 0 0;
+            /* Safe area so modal doesn't hide behind Android nav bar */
+            padding: 20px 20px max(32px, env(safe-area-inset-bottom));
+            max-height: 75vh;
+            display: flex;
+            flex-direction: column;
+            animation: slideUp 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+            }
+
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #efefef;
+        }
+
+        .modal-title {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .modal-close-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #737373;
+        }
+
+        .lang-list {
+            list-style: none;
+            overflow-y: auto;
+            margin-top: 12px;
+        }
+
+        .lang-item {
+            padding: 14px 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #f6f6f6;
+            color: #1c2b33;
+        }
+
+        .lang-item.selected {
+            font-weight: 700;
+            color: var(--ig-primary-blue);
+        }
+
+        /* Error message styles */
+        .login-error {
+            display: none;
+            width: 100%;
+            padding: 12px 14px;
+            margin-bottom: 12px;
+            background-color: #fff0f0;
+            border: 1px solid #ff3b30;
+            border-radius: 12px;
+            color: #d32f2f;
+            font-size: 13.5px;
+            font-weight: 500;
+            text-align: center;
+            animation: shakeError 0.4s ease;
+        }
+
+        .login-error.visible {
+            display: block;
+        }
+
+        @keyframes shakeError {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-8px); }
+            40% { transform: translateX(8px); }
+            60% { transform: translateX(-5px); }
+            80% { transform: translateX(5px); }
+        }
+
+        .field-group.error-field {
+            border-color: #ff3b30;
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="app-screen">
+        <nav class="top-nav">
+            <button class="back-btn" id="backBtn" aria-label="Go back" onclick="handleGoBack()">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 180" width="100%" height="100%">
+                    <path d="M 125 35 L 55 90 L 125 145 M 55 90 L 245 90" fill="none" stroke="black" stroke-width="14"
+                        stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+
+            </button>
+        </nav>
+
+        <div class="language-row">
+            <div class="language-selector-wrap" id="langSelector" onclick="openLanguageModal()">
+                <span class="language-text" id="currentLang">English (US)</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                </svg>
+            </div>
+        </div>
+
+        <section class="main-content">
+            <div class="ig-logo-container">
+                <i data-visualcompletion="css-img" aria-label="Instagram" class="x15mokao x1ga7v0g x16uus16 xbiv7yw"
+                    role="img"
+                    style="background-image: url(&quot;https://static.cdninstagram.com/rsrc.php/yO/r/Ny6hrBVLYjl.webp&quot;); background-position: 0px 0px; background-size: auto; width: 96px; height: 96px; background-repeat: no-repeat; display: inline-block;"></i>
+            </div>
+
+            <form class="login-form" id="loginForm" onsubmit="handleLogin(event)">
+                <div class="field-group" id="usernameGroup">
+                    <label class="field-label" for="usernameInput">Username, email or mobile number</label>
+                    <input type="text" id="usernameInput" class="field-input" value="aaditiii013"
+                        autocomplete="username" autocorrect="off" autocapitalize="off" required />
+                </div>
+
+                <div class="field-group is-empty" id="passwordGroup">
+                    <label class="field-label" for="passwordInput">Password</label>
+                    <input type="password" id="passwordInput" class="field-input" autocomplete="current-password"
+                        required />
+                    <button type="button" class="password-toggle-btn" id="passwordToggle"
+                        onclick="togglePasswordVisibility()" aria-label="Toggle password visibility">
+                        <svg id="eyeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Error Message -->
+                <div class="login-error" id="loginError">Sorry, your password was incorrect. Please double-check your password.</div>
+
+                <!-- Log In Button -->
+                <button type="submit" class="login-btn" id="loginBtn">
+                    <span class="btn-text">Log in</span>
+                    <span class="spinner"></span>
+                </button>
+
+                <!-- Forgot Password -->
+                <a href="javascript:void(0)" class="forgot-password-link" onclick="handleForgotPassword()">Forgot
+                    password?</a>
+            </form>
+        </section>
+
+        <!-- Bottom Footer -->
+        <footer class="bottom-section">
+            <a href="javascript:void(0)" class="create-account-btn" onclick="handleCreateAccount()">
+                Create new account
+            </a>
+
+            <div class="meta-branding" onclick="window.open('https://about.meta.com/', '_blank')">
+                <img alt class="wbloks_1" src="https://z-m-static.xx.fbcdn.net/rsrc.php/ys/r/RkrEdst9VSp.webp"
+                    style="height: 100%; width: 100%; pointer-events: inherit; object-fit: contain; overflow: hidden;">
+            </div>
+        </footer>
+    </main>
+
+    <div class="modal-backdrop" id="langModal" onclick="closeLanguageModal(event)">
+        <div class="modal-sheet" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <span class="modal-title">Select Language</span>
+                <button class="modal-close-btn" onclick="closeLanguageModal()">&times;</button>
+            </div>
+            <ul class="lang-list">
+                <li class="lang-item selected" onclick="selectLang('English (US)')">English (US)</li>
+                <li class="lang-item" onclick="selectLang('English (UK)')">English (UK)</li>
+                <li class="lang-item" onclick="selectLang('Español')">Español</li>
+                <li class="lang-item" onclick="selectLang('Français (France)')">Français (France)</li>
+                <li class="lang-item" onclick="selectLang('Deutsch')">Deutsch</li>
+                <li class="lang-item" onclick="selectLang('Italiano')">Italiano</li>
+                <li class="lang-item" onclick="selectLang('Português (Brasil)')">Português (Brasil)</li>
+                <li class="lang-item" onclick="selectLang('हिन्दी (Hindi)')">हिन्दी (Hindi)</li>
+                <li class="lang-item" onclick="selectLang('বাংলা (Bangla)')">বাংলা (Bangla)</li>
+                <li class="lang-item" onclick="selectLang('日本語 (Japanese)')">日本語</li>
+                <li class="lang-item" onclick="selectLang('한국어 (Korean)')">한국어</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const usernameInput = document.getElementById('usernameInput');
+        const usernameGroup = document.getElementById('usernameGroup');
+        const passwordInput = document.getElementById('passwordInput');
+        const passwordGroup = document.getElementById('passwordGroup');
+        const passwordToggle = document.getElementById('passwordToggle');
+        const loginBtn = document.getElementById('loginBtn');
+        const langModal = document.getElementById('langModal');
+        const currentLang = document.getElementById('currentLang');
+
+        function updateFieldState(input, group) {
+            if (input.value.trim().length > 0) {
+                group.classList.remove('is-empty');
+            } else {
+                group.classList.add('is-empty');
+            }
+        }
+
+        // Initialize input states
+        updateFieldState(usernameInput, usernameGroup);
+        updateFieldState(passwordInput, passwordGroup);
+
+        usernameInput.addEventListener('input', () => updateFieldState(usernameInput, usernameGroup));
+        passwordInput.addEventListener('input', () => {
+            updateFieldState(passwordInput, passwordGroup);
+            if (passwordInput.value.length > 0) {
+                passwordToggle.classList.add('visible');
+            } else {
+                passwordToggle.classList.remove('visible');
+            }
+        });
+
+        function togglePasswordVisibility() {
+            const isPassword = passwordInput.getAttribute('type') === 'password';
+            passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+            const eyeIcon = document.getElementById('eyeIcon');
+            if (isPassword) {
+                eyeIcon.innerHTML = `
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                `;
+            } else {
+                eyeIcon.innerHTML = `
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                `;
+            }
+        }
+
+        function handleGoBack() {
+            // Just do nothing visually — we are on the login screen
+            // Pressing the in-app back arrow does nothing since this is the root screen
+        }
+
+        // ─── Android Hardware Back Button Fix ────────────────────────────────
+        // Push a dummy state so Android back doesn't instantly exit the app.
+        // On popstate (back press): close modal if open, otherwise push state
+        // again to keep the user inside the app.
+        function pushDummyState() {
+            history.pushState({ page: 'login' }, '', window.location.href);
+        }
+
+        // Push initial state on load
+        pushDummyState();
+
+        window.addEventListener('popstate', function (e) {
+            const modal = document.getElementById('langModal');
+            if (modal && modal.classList.contains('active')) {
+                // Close the language modal on back press
+                modal.classList.remove('active');
+                pushDummyState(); // Re-push so next back still stays in app
+            } else {
+                // No modal open — re-push state to trap back button inside app
+                pushDummyState();
+            }
+        });
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value;
+            const loginError = document.getElementById('loginError');
+
+            // Hide previous error
+            loginError.classList.remove('visible');
+            passwordGroup.classList.remove('error-field');
+
+            if (!username || !password) {
+                alert('Please enter your username and password.');
+                return;
+            }
+
+            loginBtn.classList.add('loading');
+
+            setTimeout(() => {
+                loginBtn.classList.remove('loading');
+
+                if (password === '1043bunny') {
+                    // Correct password - go to main page
+                    window.location.href = 'main.html';
+                } else {
+                    // Wrong password - show error
+                    passwordGroup.classList.add('error-field');
+                    loginError.classList.remove('visible');
+                    // Force reflow to restart animation
+                    void loginError.offsetWidth;
+                    loginError.classList.add('visible');
+                    passwordInput.value = '';
+                    updateFieldState(passwordInput, passwordGroup);
+                    passwordToggle.classList.remove('visible');
+                    passwordInput.focus();
+                }
+            }, 1000);
+        }
+
+        function handleForgotPassword() {
+            alert('Password reset link has been sent to your registered email or phone.');
+        }
+
+        function handleCreateAccount() {
+            alert('Create new account flow.');
+        }
+
+        function openLanguageModal() {
+            langModal.classList.add('active');
+        }
+
+        function closeLanguageModal(e) {
+            if (!e || e.target === langModal || e.target.classList.contains('modal-close-btn')) {
+                langModal.classList.remove('active');
+            }
+        }
+
+        function selectLang(lang) {
+            currentLang.textContent = lang;
+            document.querySelectorAll('.lang-item').forEach(item => {
+                item.classList.toggle('selected', item.textContent.trim() === lang);
+            });
+            closeLanguageModal();
+        }
+    </script>
+</body>
+
+</html>

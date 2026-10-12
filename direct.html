@@ -1,0 +1,2144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content" />
+  <title>Direct • Chats</title>
+  <link rel="icon" type="image/png" href="assets/favicon.webp">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#ffffff" />
+  <link rel="manifest" href="manifest.json" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Grand+Hotel&family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <style>
+    :root {
+      --font-family-system: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --ig-primary-background: #ffffff;
+      --ig-primary-text: #000000;
+      --ig-secondary-text: #737373;
+      --ig-stroke: #efefef;
+      --ig-link: #0095f6;
+      --ig-badge-blue: #0095f6;
+      --ig-bubble-received: #efefef;
+      --ig-bubble-sent: #7928ca;
+      --ig-bubble-sent-gradient: linear-gradient(135deg, #7000ff 0%, #8a2be2 50%, #9933ff 100%);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: #0d0d0d;
+      font-family: var(--font-family-system);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      min-height: 100dvh;
+    }
+
+    img {
+      border: 0;
+      -webkit-user-drag: none;
+      user-select: none;
+    }
+
+    /* Mobile Frame */
+    .phone-container {
+      width: 100%;
+      height: 100vh;
+      height: 100dvh;
+      background-color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      /* Safe area support for Android/iOS notch & nav bar */
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+    }
+
+    @media (min-width: 768px) {
+      body {
+        background-color: #0d0d0d;
+      }
+
+      .phone-container {
+        max-width: 430px;
+        height: 92vh;
+        max-height: 920px;
+        border-radius: 36px;
+        border: 8px solid #222222;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+        overflow: hidden;
+      }
+    }
+
+    /* Top Navigation Bar */
+    .inbox-header {
+      position: sticky;
+      top: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: max(12px, env(safe-area-inset-top));
+      padding-bottom: 12px;
+      padding-left: max(16px, env(safe-area-inset-left));
+      padding-right: max(16px, env(safe-area-inset-right));
+      background: #fff;
+      z-index: 20;
+      flex-shrink: 0;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .back-btn {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: none;
+      border: none;
+      color: #000;
+      padding: 4px;
+      text-decoration: none;
+      transition: transform 0.15s ease;
+      flex-shrink: 0;
+    }
+
+    .back-btn svg {
+      width: 24px;
+      height: 24px;
+      fill: currentColor;
+      display: block;
+    }
+
+    .back-btn:active {
+      transform: scale(0.9);
+    }
+
+    .account-selector {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      position: relative;
+      min-width: 0;
+      max-width: calc(100% - 10px);
+    }
+
+    .account-name {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.4px;
+      color: #000;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .chevron-icon {
+      margin-top: 1px;
+    }
+
+    .unread-red-dot {
+      width: 9px;
+      height: 9px;
+      min-width: 7px;
+      min-height: 7px;
+      aspect-ratio: 1 / 1;
+      background-color: #ff3040;
+      border-radius: 50%;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+      overflow: hidden;
+      margin-left: 2px;
+      transition: opacity 0.2s ease;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .icon-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.15s ease;
+    }
+
+    .icon-btn:active {
+      transform: scale(0.92);
+    }
+
+    /* Main Scrollable Inbox Content */
+    .inbox-content {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      scrollbar-width: none;
+      display: flex;
+      flex-direction: column;
+      background: #ffffff;
+      padding-bottom: 20px;
+    }
+
+    .inbox-content::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* Search Bar */
+    .search-section {
+      padding: 4px 16px 14px;
+    }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      background-color: #efefef;
+      border-radius: 22px;
+      padding: 10px 16px;
+      gap: 10px;
+      cursor: text;
+    }
+
+    .search-box svg {
+      color: #000000;
+      flex-shrink: 0;
+    }
+
+    .search-input {
+      border: none;
+      background: transparent;
+      outline: none;
+      font-size: 15.5px;
+      font-family: inherit;
+      color: #000000;
+      width: 100%;
+    }
+
+    .search-input::placeholder {
+      color: #65676b;
+      font-weight: 400;
+    }
+
+    /* Notes Horizontal Tray */
+    .notes-tray {
+      display: flex;
+      gap: 12px;
+      padding: 10px 16px 14px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      flex-shrink: 0;
+      align-items: flex-end;
+    }
+
+    .notes-tray::-webkit-scrollbar {
+      display: none;
+    }
+
+    .note-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      cursor: pointer;
+      position: relative;
+      width: auto;
+      min-width: 76px;
+      max-width: 90px;
+      flex-shrink: 0;
+      transition: transform 0.15s ease;
+    }
+
+    .note-item:active {
+      transform: scale(0.95);
+    }
+
+    .note-bubble-wrap {
+      width: 100%;
+      min-height: 52px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      margin-bottom: 6px;
+      position: relative;
+    }
+
+    .note-bubble {
+      position: relative;
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 7px 10px;
+      font-size: 11.5px;
+      font-weight: 500;
+      line-height: 1.3;
+      text-align: center;
+      color: #262626;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05);
+      width: max-content;
+      max-width: 86px;
+      word-break: break-word;
+      z-index: 3;
+      box-sizing: border-box;
+    }
+
+    /* Outer small dot */
+    .note-bubble::before {
+      content: "";
+      position: absolute;
+      bottom: -6px;
+      left: 45%;
+      transform: translateX(-50%);
+      width: 6px;
+      height: 6px;
+      background: #ffffff;
+      border-radius: 50%;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05);
+      z-index: 2;
+    }
+
+    /* Inner tiny dot */
+    .note-bubble::after {
+      content: "";
+      position: absolute;
+      bottom: -11px;
+      left: 42%;
+      transform: translateX(-50%);
+      width: 3.5px;
+      height: 3.5px;
+      background: #ffffff;
+      border-radius: 50%;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05);
+      z-index: 1;
+    }
+
+    .note-avatar-wrapper {
+      position: relative;
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      margin-bottom: 6px;
+      flex-shrink: 0;
+    }
+
+    .note-avatar {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .note-add-plus {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 21px;
+      height: 21px;
+      background: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+      font-size: 14px;
+      font-weight: bold;
+      color: #262626;
+    }
+
+    .note-label {
+      font-size: 12px;
+      color: #737373;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 88px;
+      display: block;
+      height: 16px;
+      line-height: 16px;
+    }
+
+    .map-circle {
+      width: 66px;
+      height: 66px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+    }
+
+    .map-pins-preview {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+    }
+
+    .map-pins-preview img {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 1.5px solid #fff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .note-label {
+      font-size: 12px;
+      color: #737373;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 82px;
+    }
+
+    .note-subtext {
+      font-size: 10px;
+      color: #ff3040;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      margin-top: 1px;
+    }
+
+    /* Messages Section Header */
+    .messages-section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 16px 8px;
+    }
+
+    .messages-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .messages-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #000000;
+      letter-spacing: -0.3px;
+    }
+
+    .mute-icon {
+      color: #000000;
+    }
+
+    .requests-link {
+      font-size: 14px;
+      font-weight: 600;
+      color: #4452f3;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .requests-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Chat List */
+    .chat-list {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+    }
+
+    .chat-item:hover {
+      background-color: #f7f7f7;
+    }
+
+    .chat-item:active {
+      background-color: #ebebeb;
+    }
+
+    .chat-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .chat-avatar-wrapper {
+      position: relative;
+      width: 54px;
+      height: 54px;
+      flex-shrink: 0;
+    }
+
+    .chat-avatar {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .chat-story-ring {
+      width: 58px;
+      height: 58px;
+      margin: -2px;
+      border-radius: 50%;
+      padding: 2px;
+      background: linear-gradient(45deg, #ffd600 0%, #ff7a00 25%, #ff006e 60%, #d000ff 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 4px rgba(214, 41, 118, 0.3);
+    }
+
+    .chat-story-gap {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      padding: 2px;
+      background: #ffffff;
+      display: flex;
+    }
+
+    .chat-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .chat-name-row {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .chat-name {
+      font-size: 14.5px;
+      font-weight: 500;
+      color: #000000;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      letter-spacing: -0.15px;
+    }
+
+    .verified-badge {
+      display: inline-flex;
+      align-items: center;
+      color: #0095f6;
+      flex-shrink: 0;
+    }
+
+    .chat-snippet-row {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 13.5px;
+      color: #737373;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .chat-snippet {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .chat-time {
+      flex-shrink: 0;
+      font-size: 12px;
+      color: #737373;
+      white-space: nowrap;
+    }
+
+    .chat-item.unread .chat-time {
+      color: #000;
+      font-weight: 600;
+    }
+
+    /* Unread state styling */
+    .chat-item.unread .chat-name {
+      font-weight: 700;
+      color: #000000;
+    }
+
+    .chat-item.unread .chat-snippet {
+      font-weight: 600;
+      color: #000000;
+    }
+
+    .unread-indicator-dot {
+      width: 8px;
+      height: 8px;
+      min-width: 8px;
+      min-height: 8px;
+      aspect-ratio: 1 / 1;
+      background-color: #4452f3;
+      border-radius: 50%;
+      display: block;
+      flex-shrink: 0;
+      overflow: hidden;
+      margin-right: 14px;
+    }
+
+    .chat-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-left: 2px;
+      flex-shrink: 0;
+    }
+
+    .camera-quick-btn {
+      background: none;
+      border: none;
+      color: #737373;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+    }
+
+    /* Accounts to follow section */
+    .accounts-follow-section {
+      margin-top: 14px;
+      padding: 0 16px;
+    }
+
+    .accounts-follow-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+    }
+
+    .accounts-follow-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #000000;
+    }
+
+    .see-all-link {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #0095f6;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+
+    /* Bottom Navigation Bar */
+    .bottom-nav {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 10px 0 14px;
+      /* Pushes content above Android nav bar & iOS home indicator */
+      padding-bottom: max(14px, env(safe-area-inset-bottom));
+      background: #ffffff;
+      border-top: 1px solid #efefef;
+      z-index: 20;
+      flex-shrink: 0;
+      position: sticky;
+      bottom: 0;
+    }
+
+    .bottom-nav svg,
+    .bottom-nav a {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #000;
+      text-decoration: none;
+    }
+
+    .nav-avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .nav-item-wrapper {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .nav-red-dot {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background-color: #ff3040;
+      border-radius: 50%;
+      border: 1.5px solid #ffffff;
+      right: -3.5px;
+      bottom: 2px;
+      pointer-events: none;
+    }
+
+    .chat-view-modal {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
+      background: #ffffff;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transform: translateX(100%);
+      transition: transform 0.28s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    @media (min-width: 768px) {
+      .chat-view-modal {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+    }
+
+    .chat-view-modal.active {
+      transform: translateX(0);
+    }
+
+    .chat-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: max(12px, env(safe-area-inset-top));
+      padding-bottom: 10px;
+      padding-left: max(16px, env(safe-area-inset-left));
+      padding-right: max(16px, env(safe-area-inset-right));
+      background: #ffffff;
+      z-index: 110;
+      flex: 0 0 auto;
+      flex-shrink: 0;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      width: 100%;
+      position: sticky;
+      top: 0;
+    }
+
+    .chat-modal-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .chat-modal-user {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .chat-modal-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1.5px solid #e2e2e2;
+      padding: 2px;
+    }
+
+    .chat-modal-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: #000;
+      letter-spacing: -0.2px;
+      max-width: 12ch;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    .chat-modal-right {
+      display: flex;
+      align-items: center;
+      gap: 25px;
+    }
+
+    .chat-header-icon {
+      color: #000;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.15s ease;
+      width: 24px;
+      height: 24px;
+    }
+
+    .chat-header-icon svg {
+      width: 24px;
+      height: 24px;
+      max-width: 24px;
+      max-height: 24px;
+      display: block;
+    }
+
+    .chat-header-icon.sticker-icon {
+      width: 27px;
+      height: 27px;
+    }
+
+    .chat-header-icon.sticker-icon svg {
+      width: 27px;
+      height: 27px;
+      max-width: 27px;
+      max-height: 27px;
+    }
+
+    .chat-header-icon:active {
+      transform: scale(0.9);
+    }
+
+    /* Message Stream */
+    .chat-modal-body {
+      flex: 1 1 0;
+      padding: 6px 12px 6px;
+      overflow-y: scroll;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      background: #ffffff;
+      scrollbar-width: none;
+      min-height: 0;
+      max-height: 100%;
+    }
+
+    .chat-modal-body::-webkit-scrollbar {
+      display: none;
+    }
+
+    .chat-messages-inner {
+      margin-top: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      width: 100%;
+    }
+
+    /* Message Row  */
+    .msg-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      width: 100%;
+      margin: 2px 0;
+    }
+
+    .msg-row.received {
+      justify-content: flex-start;
+    }
+
+    .msg-row.sent {
+      justify-content: flex-end;
+    }
+
+    .msg-sender-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+      margin-bottom: 2px;
+    }
+
+    .msg-avatar-placeholder {
+      width: 28px;
+      height: 28px;
+      flex-shrink: 0;
+    }
+
+    .msg-bubble-container {
+      display: flex;
+      flex-direction: column;
+      max-width: 78%;
+    }
+
+    .msg-bubble-container.sent {
+      align-items: flex-end;
+    }
+
+    .msg-bubble-container.received {
+      align-items: flex-start;
+    }
+
+    .msg-bubble {
+      padding: 10px 16px;
+      font-size: 14.5px;
+      line-height: 1.35;
+      word-break: break-word;
+      display: inline-block;
+      letter-spacing: -0.1px;
+    }
+
+    .msg-row.received .msg-bubble {
+      background-color: #f2f3f5;
+      color: #000000;
+      border-radius: 20px;
+    }
+
+    .msg-row.sent .msg-bubble {
+      background: #b000e8;
+      background: linear-gradient(135deg, #a800e8 0%, #7e00e8 100%);
+      color: #ffffff;
+      border-radius: 20px;
+    }
+
+    .msg-bubble.emoji-only {
+      background: transparent !important;
+      font-size: 28px !important;
+      padding: 2px 4px !important;
+      line-height: 1.2;
+      letter-spacing: 2px;
+    }
+
+    .msg-reply-box {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      margin-bottom: 3px;
+    }
+
+    .msg-reply-label {
+      font-size: 11px;
+      color: #8e8e8e;
+      margin-bottom: 3px;
+      padding-right: 4px;
+    }
+
+    .msg-reply-bubble {
+      background: #f4f4f4;
+      color: #8e8e8e;
+      border-radius: 16px;
+      padding: 6px 14px;
+      font-size: 13.5px;
+      margin-bottom: 3px;
+      border: 1px solid #eaeaea;
+    }
+
+    .chat-timestamp-divider {
+      text-align: center;
+      font-size: 11px;
+      color: #8e8e8e;
+      margin: 6px 0 8px;
+      font-weight: 500;
+    }
+
+    .chat-modal-footer {
+      display: flex;
+      align-items: center;
+      padding-top: 8px;
+      padding-left: max(12px, env(safe-area-inset-left));
+      padding-right: max(12px, env(safe-area-inset-right));
+      padding-bottom: max(14px, env(safe-area-inset-bottom));
+      background: #ffffff;
+      flex-shrink: 0;
+      border-top: none;
+    }
+
+    .chat-input-pill {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      background: #efefef;
+      border-radius: 28px;
+      padding: 4px 8px 4px 5px;
+      min-height: 44px;
+      gap: 10px;
+    }
+
+    .chat-camera-circle-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #7000ff;
+      border: none;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: transform 0.15s ease, background-color 0.2s ease;
+    }
+
+    .chat-camera-circle-btn:active {
+      transform: scale(0.92);
+    }
+
+    .chat-text-input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      outline: none;
+      font-size: 15px;
+      font-family: inherit;
+      color: #000000;
+      padding: 6px 0;
+      max-height: 90px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      user-select: text;
+      -webkit-user-select: text;
+    }
+
+    .chat-text-input:empty::before {
+      content: attr(data-placeholder);
+      color: #737373;
+      pointer-events: none;
+      display: block;
+    }
+
+    .chat-input-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-right: 4px;
+    }
+
+    .input-action-icon {
+      color: #000000;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.15s ease;
+      width: 24px;
+      height: 24px;
+    }
+
+    .input-action-icon:active {
+      transform: scale(0.9);
+    }
+
+    .send-msg-btn {
+      background: none;
+      border: none;
+      color: #0095f6;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      display: none;
+      padding: 4px 6px;
+    }
+
+    .send-msg-btn.active {
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="phone-container">
+    <!-- Top Header -->
+    <header class="inbox-header">
+      <div class="header-left">
+        <a href="main.html" class="back-btn" aria-label="Back">
+          <svg viewBox="0 0 24 24" width="24" height="24">
+            <path fill="currentColor" d="M21 11H6.414l5.293-5.293a1 1 0 0 0-1.414-1.414l-7 7a1 1 0 0 0 0 1.414l7 7a1 1 0 0 0 1.414-1.414L6.414 13H21a1 1 0 0 0 0-2z"/>
+          </svg>
+        </a>
+        <div class="account-selector" onclick="alert('Switching account: 10.13_mine')">
+          <span class="account-name">aaditiii013</span>
+          <svg aria-label="Down chevron icon" class="x1lliihq x1n2onr6 x5n08af" fill="currentColor" height="14"
+            role="img" viewBox="0 0 25 25" width="16">
+            <title>Down chevron icon</title>
+            <path
+              d="M12 17.502a1 1 0 0 1-.707-.293l-9-9.004a1 1 0 0 1 1.414-1.414L12 15.087l8.293-8.296a1 1 0 0 1 1.414 1.414l-9 9.004a1 1 0 0 1-.707.293Z">
+            </path>
+          </svg>
+          <span class="unread-red-dot" id="headerUnreadDot"></span>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <!-- Compose Message Icon -->
+        <button class="icon-btn" aria-label="New Message" onclick="openNewChatPrompt()">
+          <svg aria-label="New message" class="x1lliihk x1n2onr6 x5n08af" fill="currentColor" height="24" role="img"
+            viewBox="0 0 24 24" width="24">
+            <title>New message</title>
+            <path d="M12.202 3.203H5.25a3 3 0 0 0-3 3V18.75a3 3 0 0 0 3 3h12.547a3 3 0 0 0 3-3v-6.952" fill="none"
+              stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+            <path
+              d="M10.002 17.226H6.774v-3.228L18.607 2.165a1.417 1.417 0 0 1 2.004 0l1.224 1.225a1.417 1.417 0 0 1 0 2.004Z"
+              fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+            <line fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              x1="16.848" x2="20.076" y1="3.924" y2="7.153"></line>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="inbox-content" id="inboxContent">
+      <!-- Search Bar -->
+      <section class="search-section">
+        <div class="search-box">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+            preserveAspectRatio="xMidYMid meet">
+            <g transform="translate(0,24) scale(0.002070,-0.002070)" fill="currentColor" stroke="none">
+              <path
+                d="M4830 10586 c-3173 -275 -4920 -3825 -3174 -6446 1288 -1933 3957 -2389 5873 -1003 l98 72 1062 -1073 c1168 -1181 1150 -1166 1381 -1164 395 2 624 384 438 728 -33 60 -406 443 -1099 1127 -577 570 -1049 1045 -1049 1055 0 10 44 75 98 143 544 696 932 1820 753 2185 -150 306 -541 353 -776 93 -77 -85 -95 -135 -145 -398 -359 -1898 -2387 -3074 -4250 -2465 -1712 559 -2596 2515 -1902 4208 672 1639 2387 2396 4096 1808 297 -102 308 -104 414 -82 357 75 511 450 309 755 -190 286 -1313 528 -2127 457z" />
+              <path
+                d="M8996 10307 c-66 -43 -82 -74 -147 -287 -172 -561 -623 -988 -1195 -1131 -228 -58 -314 -173 -241 -324 43 -87 68 -100 340 -185 552 -172 959 -599 1119 -1174 52 -190 178 -268 328 -206 74 31 89 56 171 294 198 575 591 945 1186 1117 392 114 381 369 -21 487 -603 178 -999 567 -1186 1165 -77 247 -208 337 -354 244z" />
+            </g>
+          </svg>
+          <input type="text" class="search-input" id="chatSearchInput" name="instagram_chat_search"
+            placeholder="Search or ask Meta AI" autocomplete="off" autocorrect="off" autocapitalize="none"
+            spellcheck="false" data-form-type="other" data-lpignore="true" />
+        </div>
+      </section>
+
+      <section class="notes-tray" id="notesTrayContainer">
+      </section>
+
+      <!-- Messages Header -->
+      <section class="messages-section-header">
+        <div class="messages-title-wrap">
+          <span class="messages-title">Messages</span>
+        </div>
+        <a href="#" class="requests-link" onclick="alert('Message Requests (2 new requests)')">Requests</a>
+      </section>
+      <section class="chat-list" id="chatListContainer"></section>
+
+      <section class="accounts-follow-section">
+        <div class="accounts-follow-header">
+          <span class="accounts-follow-title">Accounts to follow</span>
+          <a href="#" class="see-all-link" onclick="alert('Viewing all suggested accounts')">See all</a>
+        </div>
+      </section>
+    </main>
+
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="bottom-nav">
+      <!-- Home -->
+      <a href="main.html" aria-label="Home" style="color: inherit; text-decoration: none;">
+        <svg aria-label="Home" fill="currentColor" height="24" role="img" viewBox="0 0 24 24" width="24">
+          <title>Home</title>
+          <path
+            d="m21.762 8.786-7-6.68a3.994 3.994 0 0 0-5.524 0l-7 6.681A4.017 4.017 0 0 0 1 11.68V19c0 2.206 1.794 4 4 4h3.005a1 1 0 0 0 1-1v-7.003a2.997 2.997 0 0 1 5.994 0V22a1 1 0 0 0 1 1H19c2.206 0 4-1.794 4-4v-7.32a4.02 4.02 0 0 0-1.238-2.894Z">
+          </path>
+        </svg>
+      </a>
+
+      <!-- Reels -->
+      <a href="reel.html" aria-label="Home" style="color: inherit; text-decoration: none;">
+        <svg aria-label="Reels" fill="currentColor" height="24" role="img" viewBox="0 0 24 24" width="24">
+          <title>Reels</title>
+          <path
+            d="M22.935 7.468c-.063-1.36-.307-2.142-.512-2.67a5.341 5.341 0 0 0-1.27-1.95 5.345 5.345 0 0 0-1.95-1.27c-.53-.206-1.311-.45-2.672-.513C15.333 1.012 14.976 1 12 1s-3.333.012-4.532.065c-1.36.063-2.142.307-2.67.512-.77.298-1.371.69-1.95 1.27a5.36 5.36 0 0 0-1.27 1.95c-.206.53-.45 1.311-.513 2.672C1.012 8.667 1 9.024 1 12s.012 3.333.065 4.532c.063 1.36.307 2.142.512 2.67.297.77.69 1.372 1.27 1.95.58.581 1.181.974 1.95 1.27.53.206 1.311.45 2.672.513C8.667 22.988 9.024 23 12 23s3.333-.012 4.532-.065c1.36-.063 2.142-.307 2.67-.512a5.33 5.33 0 0 0 1.95-1.27 5.356 5.356 0 0 0 1.27-1.95c.206-.53.45-1.311.513-2.672.053-1.198.065-1.555.065-4.531s-.012-3.333-.065-4.532Zm-1.998 8.972c-.05 1.07-.228 1.652-.38 2.04-.197.51-.434.874-.82 1.258a3.362 3.362 0 0 1-1.258.82c-.387.151-.97.33-2.038.379-1.162.052-1.51.063-4.441.063s-3.28-.01-4.44-.063c-1.07-.05-1.652-.228-2.04-.38a3.354 3.354 0 0 1-1.258-.82 3.362 3.362 0 0 1-.82-1.258c-.151-.387-.33-.97-.379-2.038C3.011 15.28 3 14.931 3 12s.01-3.28.063-4.44c.05-1.07.228-1.652.38-2.04.197-.51.434-.875.82-1.26a3.372 3.372 0 0 1 1.258-.819c.387-.15.97-.329 2.038-.378C8.72 3.011 9.069 3 12 3s3.28.01 4.44.063c1.07.05 1.652.228 2.04.38.51.197.874.433 1.258.82.385.382.622.747.82 1.258.151.387.33.97.379 2.038C20.989 8.72 21 9.069 21 12s-.01 3.28-.063 4.44Zm-4.584-6.828-5.25-3a2.725 2.725 0 0 0-2.745.01A2.722 2.722 0 0 0 6.988 9v6c0 .992.512 1.88 1.37 2.379.432.25.906.376 1.38.376.468 0 .937-.123 1.365-.367l5.25-3c.868-.496 1.385-1.389 1.385-2.388s-.517-1.892-1.385-2.388Zm-.993 3.04-5.25 3a.74.74 0 0 1-.748-.003.74.74 0 0 1-.374-.649V9a.74.74 0 0 1 .374-.65.737.737 0 0 1 .748-.002l5.25 3c.341.196.378.521.378.652s-.037.456-.378.651Z">
+          </path>
+        </svg>
+      </a>
+
+      <div class="nav-item-wrapper" style="color: inherit;">
+        <svg class="action-icon" aria-label="Direct" width="24" height="24" viewBox="0 0 24 24" role="img"
+          fill="currentColor">
+          <path
+            d="M13.973 20.046 21.77 6.928C22.8 5.195 21.55 3 19.535 3H4.466C2.138 3 .984 5.825 2.646 7.456l4.842 4.752 1.723 7.121c.548 2.266 3.571 2.721 4.762.717Z">
+          </path>
+          <line fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="7.488"
+            x2="15.515" y1="12.208" y2="7.641"></line>
+        </svg>
+        <div class="nav-red-dot"></div>
+      </div>
+
+      <!-- Search -->
+      <a href="search.html" aria-label="Search" style="color: inherit; text-decoration: none;">
+        <svg aria-label="Search" fill="none" stroke="currentColor" stroke-width="2.2" height="24" role="img"
+          viewBox="0 0 24 24" width="24">
+          <title>Search</title>
+          <path d="M19 10.5A8.5 8.5 0 1 1 10.5 2a8.5 8.5 0 0 1 8.5 8.5Z"></path>
+          <line x1="16.5" y1="16.5" x2="22" y2="22" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" />
+        </svg>
+      </a>
+
+      <!-- Profile -->
+      <div class="nav-item-wrapper" onclick="alert('Viewing Profile')">
+        <img class="nav-avatar" src="https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/pfp.webp" alt="Profile" />
+        <div class="nav-red-dot"></div>
+      </div>
+    </nav>
+
+    <div class="chat-view-modal" id="chatViewModal">
+      <!-- Top Chat Header -->
+      <div class="chat-modal-header">
+        <div class="chat-modal-left">
+          <button class="back-btn" onclick="closeChat()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 640 640" fill="currentColor"
+              aria-label="Back">
+              <path
+                d="M73.4 297.4C60.9 309.9 60.9 330.2 73.4 342.7L233.4 502.7C245.9 515.2 266.2 515.2 278.7 502.7C291.2 490.2 291.2 469.9 278.7 457.4L173.3 352L544 352C561.7 352 576 337.7 576 320C576 302.3 561.7 288 544 288L173.3 288L278.7 182.6C291.2 170.1 291.2 149.8 278.7 137.3C266.2 124.8 245.9 124.8 233.4 137.3L73.4 297.3z" />
+            </svg>
+          </button>
+          <div class="chat-modal-user">
+            <img class="chat-modal-avatar" id="modalUserAvatar" src="" alt="User" />
+            <div style="display: flex; align-items: center; gap: 4px;">
+              <span class="chat-modal-name" id="modalUserName">User</span>
+              <span id="modalVerifiedBadge"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="chat-modal-right">
+          <!-- Sticker SVG -->
+          <div class="chat-header-icon sticker-icon" onclick="alert('Sticker Reaction Tray')">
+            <svg version="1.0" xmlns="http://www.w3.org/2000/svg" width="27" height="27" viewBox="22 20 86 78"
+              preserveAspectRatio="xMidYMid meet">
+              <g transform="translate(0.000000,112.000000) scale(0.100000,-0.100000)" fill="#000000" stroke="none">
+                <path
+                  d="M687 856 c-48 -18 -102 -59 -123 -95 -11 -18 -36 -37 -70 -51 -69 -28 -145 -110 -173 -185 -70 -186 49 -377 233 -375 77 1 170 51 204 109 8 15 40 39 73 55 192 93 251 343 113 480 -69 69 -168 93 -257 62z m144 -57 c47 -16 104 -73 118 -118 32 -109 -8 -224 -102 -292 -49 -36 -67 -37 -67 -4 0 31 -31 94 -56 116 -11 9 -33 24 -51 33 -74 37 -101 138 -55 203 43 61 136 87 213 62z m-291 -163 c0 -60 45 -122 113 -158 28 -14 44 -32 59 -65 19 -43 19 -50 6 -92 -25 -83 -132 -131 -222 -101 -169 56 -183 295 -23 411 49 35 67 37 67 5z" />
+                <path
+                  d="M757 744 c-4 -4 -7 -23 -7 -42 0 -31 -2 -34 -24 -28 -16 4 -30 0 -40 -9 -23 -23 -9 -45 29 -45 32 0 34 -2 37 -37 3 -33 6 -38 28 -38 22 0 25 5 28 38 2 29 7 38 20 36 34 -3 50 1 56 16 8 21 -19 43 -48 38 -22 -5 -25 -2 -28 33 -2 30 -8 40 -23 42 -12 2 -24 0 -28 -4z" />
+                <path d="M444 426 c-10 -26 4 -48 28 -44 33 4 33 52 0 56 -13 2 -25 -3 -28 -12z" />
+                <path d="M587 428 c-6 -18 11 -48 27 -48 20 0 37 25 30 44 -7 19 -50 22 -57 4z" />
+                <path
+                  d="M457 343 c-15 -14 -6 -43 17 -58 51 -34 166 -9 166 36 0 28 -26 34 -64 14 -30 -16 -34 -16 -64 -1 -34 18 -45 19 -55 9z" />
+              </g>
+            </svg>
+          </div>
+          <!-- Audio Call SVG -->
+          <div class="chat-header-icon" onclick="alert('Calling...')">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path
+                d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
+              </path>
+            </svg>
+          </div>
+          <!-- Video Call SVG -->
+          <div class="chat-header-icon" onclick="alert('Video calling...')">
+            <svg aria-label="Video call" class="x1lliihg x1n2onr6 x5n08af" fill="currentColor" height="24" role="img"
+              viewBox="0 0 24 24" width="24">
+              <title>Video call</title>
+              <rect fill="none" height="18" rx="3" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                stroke-width="2" width="16.999" x="1" y="3"></rect>
+              <path d="m17.999 9.146 2.495-2.256A1.5 1.5 0 0 1 23 8.003v7.994a1.5 1.5 0 0 1-2.506 1.113L18 14.854"
+                fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+              </path>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Message History List -->
+      <div class="chat-modal-body" id="chatMessagesContainer">
+      </div>
+
+      <!-- Bottom Chat Input Bar -->
+      <div class="chat-modal-footer">
+        <!-- Message Pill Input with Action Icons -->
+        <div class="chat-input-pill">
+          <!-- Purple Camera Circle Button -->
+          <button class="chat-camera-circle-btn" aria-label="Camera" onclick="alert('Open Camera')">
+            <svg aria-label="Camera" width="20" height="20" viewBox="0 0 24 24" fill="white" role="img">
+              <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"></path>
+              <path
+                d="M19.333 4.5h-2.868l-.804-1.34a2 2 0 0 0-1.714-.972H10.05a2 2 0 0 0-1.714.972L7.535 4.5H4.667A2.667 2.667 0 0 0 2 7.167v10.666A2.667 2.667 0 0 0 4.667 20.5h14.666A2.667 2.667 0 0 0 22 17.833V7.167A2.667 2.667 0 0 0 19.333 4.5ZM12 17a5 5 0 1 1 5-5 5.006 5.006 0 0 1-5 5Z">
+              </path>
+            </svg>
+          </button>
+
+          <div class="chat-text-input" id="messageInput" contenteditable="true" role="textbox" aria-multiline="true"
+            data-placeholder="Message..." spellcheck="false" autocorrect="on" autocapitalize="sentences"></div>
+
+          <div class="chat-input-actions" id="chatInputActions">
+            <!-- Voice Icon -->
+            <div class="input-action-icon" onclick="alert('Voice Message recording')">
+              <svg aria-label="Voice Clip" class="x1lliihk x1n2onr6 x5n08af" fill="currentColor" height="24" role="img"
+                viewBox="0 0 24 24" width="24">
+                <title>Voice Clip</title>
+                <path d="M19.5 10.671v.897a7.5 7.5 0 0 1-15 0v-.897" fill="none" stroke="currentColor"
+                  stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                <line fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  x1="12" x2="12" y1="19.068" y2="22"></line>
+                <line fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  x1="8.706" x2="15.104" y1="22" y2="22"></line>
+                <path d="M12 15.745a4 4 0 0 0 4-4V6.745a4 4 0 0 0-8 0v4.999a4 4 0 0 0 4 4Z" fill="none"
+                  stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+              </svg>
+            </div>
+            <!-- Image Icon -->
+            <div class="input-action-icon" onclick="alert('Choose photo from gallery')">
+              <svg aria-label="Add Photo or Video" class="x1lliihq x1n2onr6 x5n08af" fill="currentColor" height="24"
+                role="img" viewBox="0 0 24 24" width="24">
+                <title>Add Photo or Video</title>
+                <path d="M6.549 5.013A1.557 1.557 0 1 0 8.106 6.57a1.557 1.557 0 0 0-1.557-1.557Z" fill-rule="evenodd">
+                </path>
+                <path
+                  d="m2 18.605 3.901-3.9a.908.908 0 0 1 1.284 0l2.807 2.806a.908.908 0 0 0 1.283 0l5.534-5.534a.908.908 0 0 1 1.283 0l3.905 3.905"
+                  fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="2"></path>
+                <path
+                  d="M18.44 2.004A3.56 3.56 0 0 1 22 5.564v12.873a3.56 3.56 0 0 1-3.56 3.56H5.568a3.56 3.56 0 0 1-3.56-3.56V5.563a3.56 3.56 0 0 1 3.56-3.56Z"
+                  fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                </path>
+              </svg>
+            </div>
+            <!-- Sticker Face Icon -->
+            <div class="input-action-icon" onclick="alert('Stickers')">
+              <svg aria-label="Choose a GIF or sticker" class="x1lliihg x1n2onr6 x5n08af" fill="currentColor"
+                height="24" role="img" viewBox="0 0 24 24" width="24">
+                <title>Choose a GIF or sticker</title>
+                <path
+                  d="M13.11 22H7.416A5.417 5.417 0 0 1 2 16.583V7.417A5.417 5.417 0 0 1 7.417 2h9.166A5.417 5.417 0 0 1 22 7.417v5.836a2.083 2.083 0 0 1-.626 1.488l-6.808 6.664A2.083 2.083 0 0 1 13.11 22Z"
+                  fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                </path>
+                <circle cx="8.238" cy="9.943" r="1.335"></circle>
+                <circle cx="15.762" cy="9.943" r="1.335"></circle>
+                <path d="M15.174 15.23a4.887 4.887 0 0 1-6.937-.301" fill="none" stroke="currentColor"
+                  stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                <path
+                  d="M22 10.833v1.629a1.25 1.25 0 0 1-1.25 1.25h-1.79a5.417 5.417 0 0 0-5.417 5.417v1.62a1.25 1.25 0 0 1-1.25 1.25H9.897"
+                  fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                </path>
+              </svg>
+            </div>
+            <!-- Circle Plus Icon -->
+            <div class="input-action-icon" onclick="alert('More options')">
+              <svg aria-label="More options" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img">
+                <title>More options</title>
+                <circle cx="12" cy="12" r="9.5"></circle>
+                <line x1="12" y1="8" x2="12" y2="16"></line>
+                <line x1="8" y1="12" x2="16" y2="12"></line>
+              </svg>
+            </div>
+          </div>
+
+          <button class="send-msg-btn" id="sendBtn" onclick="sendMessage()">Send</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const allUsers = [
+      {
+        id: "10.13_mine",
+        name: "10.13_mine",
+        displayName: "10.13_mine",
+        avatar: "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/10.13_mine.webp",
+        verified: false,
+        hasStoryRing: false,
+        isUnread: true,
+        isPinned: true,
+        note: "Happy Birthday meri jaan! 🎂💖",
+        snippet: "Happy Birthday Babygirl! ky girl chahiye? 🎂🥳 · 9h",
+        status: "Active 4h ago",
+        history: [
+          
+          { sender: "other", text: "Happy Birthday, my Honeyyyy 🥹💗" },
+          { sender: "other", text: "Happy birthday to my favourite girl, my love and my cutie. ❤️ Baby I can't explain how much I love you but I am really happy to have you in my life. Thank you for being my partner, for choosing me and loving me. I feel so lucky to have you Honeybaby 🫶🏻💋" },
+          { sender: "other", text: "I love everything about you, baby. Your smile, your eyes, your voice, your cute expressions, your childish behaviour, your anger, your mood swings and your naughty side too. 😭❤️ I love all these little things about you. You don't even know how cute you are to me. I can look at you all day and still never get bored of you. 🙈💗" },
+          { sender: "other", text: "Thank you for always giving me your love, care and time. Thank you for every hug, kiss, our cute talks, silly fights and all the memories we made together. And baby, thank you for trusting me and sharing all those intimate moments with me too. ❤️‍🔥🙈 Every kiss, every touch and all our spicy little secrets are really special to me. I love those moments because it was you and me together. 💋❤️" },
+
+          { sender: "other", text: "Happy birthday once again, my Honey. 🥹💗 I just want you to be happy always and keep smiling like you do. Thank you for being my girl and making my life more beautiful. I love you so much and I really want to make many more memories with you." },
+          { sender: "other", text: "I LOVE YOU SOOO MUCH MY HONEYYYYY ❤️💋 Happy birthday my princess, your boy loves you a lotttt. 💗😘", hasAvatar: true }
+        ]
+      },
+      {
+        id: "subhankar0724",
+        name: "subhankar0724",
+        displayName: "subhankar0724",
+        avatar: "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/subhankar0724.webp",
+        verified: false,
+        hasStoryRing: false,
+        isUnread: true,
+        isPinned: true,
+        note: "Happy Birthday Honey ❤️✨",
+        snippet: "Happy Birthday to my favorite person Honey! 🌸🎂 · 9h",
+        status: "Active now",
+        history: [
+          
+          { sender: "other", text: "Happy Birthday, my Honeyyyy! ❤️ Today is all about you, my baby! I hope you smile a lot today and feel all the love you deserve. You are such a special part of my life, and I honestly can't imagine my days without you now. You make me happy in so many little ways, and even a simple conversation with you can make my day better. I love seeing your smile, hearing your voice, and watching you be your cute little self. 😭💗 I wish I could be beside you right now, hug you tightly, kiss your forehead, and tell you how much you mean to me. Happy birthday, my pretty girl! I love you sooo much! ❤️" },
+          { sender: "other", text: "😘😘😘😘", hasAvatar: true }
+
+        ]
+      },
+      {
+        id: "subhankar.das_",
+        name: "subhankar.das_",
+        displayName: "Subhankar Das",
+        avatar: "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/subhankar.das_.webp",
+        verified: true,
+        hasStoryRing: false,
+        isUnread: true,
+        isPinned: true,
+
+        note: "Happy Birthday Baby! 🎂🎉",
+        snippet: "Wishing you a super Happy Birthday Baby! 🎂✨ · 9h",
+        status: "Active today",
+        history: [
+          
+          { sender: "other", text: "My Honey, I wish you all the happiness in the world. ❤️ I hope all your dreams come true, you achieve everything you want, and you always have reasons to smile. I want to make more memories with you, go on more dates, have more hugs and kisses, laugh with you, annoy you, and love you more every day. 😂💋 Even if we fight sometimes, I hope we always understand each other and stay together. I want you to feel loved and happy with me. Thank you for coming into my life and being MY GIRL. I love you soooo much, Honeyyyy. Happy birthday, my princess! You are my favourite, my baby, and my forever favourite girl. 👑😘" },
+          { sender: "other", text: "😘😘😘😘", hasAvatar: true }
+        ]
+      },
+      {
+        id: "youknowsamael",
+        name: "youknowsamael",
+        displayName: "Youknowsamael",
+        avatar: "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/youknowsamael.webp",
+        verified: false,
+        hasStoryRing: false,
+        isUnread: true,
+        isPinned: true,
+        note: "Happy Bday meri rasmalai! 🌸🎂",
+        snippet: "Happy Birthday Honey! Have an epic day! 🍿✨ · 9h",
+        status: "Active 1d ago",
+        history: [
+          { sender: "other", text: "Happy Birthday to the sweetest, cutest, and most special girl in the world, Honey! 🌸🎂✨" },
+          { sender: "other", text: "Thank you for bringing so much happiness and smiles into my life every single day. ❤️" },
+          { sender: "other", text: "May all your dreams and wishes come true this year! 🌟💖" },
+          { sender: "other", text: "Always here for you, my favorite person! 🎁✨", hasAvatar: true }
+        ]
+      },
+      {
+        id: "disney",
+        name: "disney",
+        displayName: "Disney",
+        avatar: "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/disney.webp",
+        verified: true,
+        hasStoryRing: false,
+        isUnread: true,
+        note: "Magical Birthday Adity 🏰✨",
+        snippet: "Happy Birthday Adity! Where dreams come true 👑🎂 · 35m",
+        status: "Active 20m ago",
+        history: [
+          { sender: "other", text: "Happy Birthday, Princess Adity! 👑💖 The whole Disney kingdom is celebrating the cutest princess today!" },
+          { sender: "other", text: "I wish you could be my Disney kingdom's princess too 🥹👑, but unfortunately, you already belong to your bunny. 🐰💗" },
+          { sender: "other", text: "Honestly, it's Disney's biggest loss that the most beautiful princess in the world doesn't belong to our kingdom! 😭✨🏰", hasAvatar: true }
+        ]
+      },
+      {
+        id: "tomholland2013",
+        name: "tomholland2013",
+        displayName: "Tom Holland",
+        avatar: "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/tomholland2013.webp",
+        verified: true,
+        hasStoryRing: false,
+        isUnread: true,
+        note: "HBD Adity! 🕷️🎂",
+        snippet: "Happy Birthday Adity! Have a heroic year ❤️🎉 · 45m",
+        status: "Active 12m ago",
+        history: [
+          { sender: "other", text: "Hey Adity! Happy Birthday! 🥳❤️ I hope you have the most amazing day." },
+          { sender: "other", text: "And since it's your birthday... I guess I have to give the birthday girl a special Spider-Man hug. 😉🕷️❤️", hasAvatar: true }
+        ]
+      },
+      {
+        id: "milliebobbybrown",
+        name: "milliebobbybrown",
+        displayName: "Millie Bobby Brown",
+        avatar: "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/milliebobbybrown.webp",
+        verified: true,
+        hasStoryRing: false,
+        isUnread: true,
+        note: "Happy Bday Adity 🎂",
+        snippet: "Happy Birthday sweet Adity! Sending lots of love ✨ · 55m",
+        status: "Active 18m ago",
+        history: [
+          { sender: "other", text: "Happy Birthday, Adity! 🥹💗 I hope your day is as beautiful and amazing as you are!" },
+          { sender: "other", text: "Psst... I know I'm your boyfriend's crush 👀😂 but don't worry, Adity... he's yours, so you better keep him happy! 😏💕", hasAvatar: true }
+        ]
+      },
+      {
+        id: "taylorswift",
+        name: "taylorswift",
+        displayName: "Taylor Swift",
+        avatar: "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/taylorswift.webp",
+        verified: true,
+        hasStoryRing: false,
+        isUnread: true,
+        note: "Happy Birthday Adity 💖✨",
+        snippet: "Happy Birthday Adity! Stay fearless & sparkling ✨🎂 · 1h",
+        status: "Active 2h ago",
+        history: [
+          { sender: "other", text: "Happy Birthday, Adity! 💕✨ I hope your day is filled with beautiful moments and unforgettable memories." },
+          { sender: "other", text: "Keep shining, keep dreaming, and never forget how special you are. 🥹💖", hasAvatar: true }
+        ]
+      },
+      {
+        id: "arijitsingh",
+        name: "arijitsingh",
+        displayName: "Arijit Singh",
+        avatar: "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/arijitsingh.webp",
+        verified: true,
+        hasStoryRing: false,
+        isUnread: true,
+        note: "Janmadiner shubechha Adity 🎶🎂",
+        snippet: "Happy Birthday Adity! Sur aur khushiyon bhara saal ho 🎵✨ · 2h",
+        status: "Active 2h ago",
+        history: [
+          { sender: "other", text: "Janmadiner onek shubhechha, Adity! ❤️🎶 Tomar din ta hok khub shundor aar anonde bhora." },
+          { sender: "other", text: "Tomar jiboner protita din ekta shundor gaaner moto hok. ✨🌸", hasAvatar: true }
+        ]
+      },
+
+      {
+        id: "rapunzel",
+        name: "rapunzel",
+        displayName: "Rapunzel",
+        avatar: "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/rapunzel.webp",
+        verified: true,
+        hasStoryRing: false,
+        isUnread: true,
+        note: "Best Birthday Ever Adity! ☀️🌸",
+        snippet: "Happy Birthday Adity! Light the lanterns tonight 🏮🎂 · 3h",
+        status: "Active 10h ago",
+        history: [
+          { sender: "other", text: "OMG Adityyy! 🌸✨ Happy Birthday!! You’re officially the cutest princess ever! 👑💖" },
+          { sender: "other", text: "Keep shining as brightly as your lanterns, Princess! 🏮💗", hasAvatar: true }
+        ]
+      },
+      {
+        id: "flynnrider",
+        name: "flynnrider",
+        displayName: "Flynn Rider",
+        avatar: "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/flynnrider.webp",
+        verified: true,
+        hasStoryRing: false,
+        isUnread: true,
+        note: "HBD Adity 😏🎂",
+        snippet: "Happy Birthday Adity! Time for an adventure ✨🎉 · 3h",
+        status: "Active 9h ago",
+        history: [
+          { sender: "other", text: "Alright, Adity, I'll admit it... today you're the most beautiful girl in the kingdom. Happy Birthday 😉👑" },
+          { sender: "other", text: "And yes, even I know when a princess is worth stealing the spotlight for. 😏✨", hasAvatar: true }
+        ]
+      },
+      {
+        id: "belle",
+        name: "belle",
+        displayName: "Belle",
+        avatar: "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/belle.webp",
+        verified: true,
+        hasStoryRing: false,
+        isUnread: true,
+        note: "Happy Birthday Adity 📖🥀",
+        snippet: "Happy Birthday Adity! A beautiful storybook year 📚🎂 · 4h",
+        status: "Active 15h ago",
+        history: [
+          { sender: "other", text: "Happy Birthday, Adity! 🌹✨ May your day be filled with love, magic, and beautiful stories. 💕" },
+          { sender: "other", text: "Never stop being the beautiful soul who makes every story brighter. 📖💛", hasAvatar: true }
+        ]
+      },
+      {
+        id: "nickwilde",
+        name: "nickwilde",
+        displayName: "Nick Wilde",
+        avatar: "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/nickwilde.webp",
+        verified: true,
+        hasStoryRing: false,
+        isUnread: true,
+        note: "HBD Adity 🦊🐾",
+        snippet: "Happy Birthday Adity! Sweet like a Pawpsicle 🍦🎂 · 4h",
+        status: "Active 9h ago",
+        history: [
+          { sender: "other", text: "Happy Birthday, Bunny's Carrots! 🦊🎂 Hope your day is dangerously awesome. 😉" },
+          { sender: "other", text: "Now go make some birthday memories worth getting into trouble for. 😏🎉", hasAvatar: true }
+        ]
+      },
+      {
+        id: "judyhopps",
+        name: "judyhopps",
+        displayName: "Judy Hopps",
+        avatar: "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/judyhopps.webp",
+        verified: true,
+        hasStoryRing: false,
+        isUnread: true,
+        note: "Try Everything Adity! 🥕🎂",
+        snippet: "Happy Birthday Adity! Keep reaching for the stars 🌟🐰 · 5h",
+        status: "Active 11h ago",
+        history: [
+          { sender: "other", text: "Happy Birthday, Adity!! 🐰💗 Today is YOUR day! Believe in yourself and keep being amazing! ✨" },
+          { sender: "other", text: "Remember, there's nothing you can't do when you believe in yourself! 🌟", hasAvatar: true }
+        ]
+      },
+      {
+        id: "sofia",
+        name: "sofia",
+        displayName: "Sofia the First",
+        avatar: "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/sofia.webp",
+        verified: true,
+        hasStoryRing: false,
+        isUnread: true,
+        note: "Royal Bday Adity 👑",
+        snippet: "Happy Birthday Princess Adity! Stay royal ✨🎂 · 5h",
+        status: "Active 13h ago",
+        history: [
+          { sender: "other", text: "Happy Birthday, Adity! 👑 You're a very special princess, and I hope your day is truly magical! ✨" },
+          { sender: "other", text: "May your heart always be kind, brave, and full of magic. 🪄💖", hasAvatar: true }
+        ]
+      },
+      {
+        id: "winnie",
+        name: "winnie",
+        displayName: "Winnie The Pooh",
+        avatar: "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/winnie.webp",
+        verified: true,
+        hasStoryRing: false,
+        isUnread: true,
+        note: "Sweet Birthday Adity 🍯💛",
+        snippet: "Happy Birthday Adity! Sweeter than honey pots 🍯🎂 · 5h",
+        status: "Active 6h ago",
+        history: [
+          { sender: "other", text: "Happy Birthday, Adity! 🍯💛 I hope your day is filled with honey, happiness, and lots and lots of hugs! 🥰" },
+          { sender: "other", text: "Sometimes the smallest moments make the biggest birthday memories. 🐝💛", hasAvatar: true }
+        ]
+      },
+      {
+        id: "icebear",
+        name: "icebear",
+        displayName: "Ice Bear",
+        avatar: "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/icebear.webp",
+        verified: true,
+        hasStoryRing: false,
+        isUnread: true,
+        note: "Ice Bear baked cake 🎂❄️",
+        snippet: "Ice Bear wishes Adity a very Happy Birthday 🥞🐻 · 6h",
+        status: "Active 14h ago",
+        history: [
+          { sender: "other", text: "Ice Bear wishes Adity happy birthday. 🎂🐻 Ice Bear hopes Adity has a very happy day. 💗" },
+          { sender: "other", text: "Ice Bear also recommends extra hugs. Ice Bear approves. 🐻💗", hasAvatar: true }
+        ]
+      },
+      {
+        id: "teddysphotos",
+        name: "teddysphotos",
+        displayName: "Ed Sheeran",
+        avatar: "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/teddysphotos.webp",
+        verified: true,
+        hasStoryRing: false,
+        isUnread: true,
+        note: "Happy Birthday Adity 🎸🎉",
+        snippet: "Happy Birthday Adity! Keep the good vibes high 🎶🎂 · 6h",
+        status: "Active 10h ago",
+        history: [
+          { sender: "other", text: "Happy Birthday, Adity! 🎂❤️ Hope your day is filled with love, laughter, and a little perfect music." },
+          { sender: "other", text: "Here's to another beautiful chapter of your story. 🎶✨", hasAvatar: true }
+        ]
+      },
+
+      {
+        id: "ahaanpandayy",
+        name: "ahaanpandayy",
+        displayName: "Ahaan Panday",
+        avatar: "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/ahaanpandayy.webp",
+        verified: true,
+        hasStoryRing: false,
+        isUnread: true,
+        note: "Happy Birthday Adity 🌟🎂",
+        snippet: "Happy Birthday Adity! Wishing you all the best 🎉✨ · 7h",
+        status: "Active 1d ago",
+        history: [
+          { sender: "other", text: "Happy Birthday Adity! 🌟🎂 Wishing you lots of love, success, and endless happiness on your special day! 🎉" },
+          { sender: "other", text: "Enjoy every moment today! 🥂✨", hasAvatar: true }
+        ]
+      }
+    ];
+
+    // Build dynamic conversations map
+    const conversations = {};
+    allUsers.forEach(u => {
+      conversations[u.id] = {
+        name: u.displayName,
+        avatar: u.avatar,
+        verified: u.verified,
+        status: u.status,
+        messages: JSON.parse(JSON.stringify(u.history))
+      };
+    });
+
+    const notesTrayContainer = document.getElementById("notesTrayContainer");
+
+    function renderNotesTray() {
+      notesTrayContainer.innerHTML = "";
+
+      // 1. User's Note
+      const userNoteDiv = document.createElement("div");
+      userNoteDiv.className = "note-item";
+      userNoteDiv.onclick = createNewNote;
+      userNoteDiv.innerHTML = `
+        <div class="note-bubble-wrap">
+          <div class="note-bubble" id="currentUserNoteBubble">
+            Celebrating my Birthday! 🎂✨
+          </div>
+        </div>
+        <div class="note-avatar-wrapper">
+          <img class="note-avatar" src="https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/pfp.webp" alt="Your note" />
+        </div>
+        <span class="note-label">Your note</span>
+      `;
+      notesTrayContainer.appendChild(userNoteDiv);
+
+      // 2. All Users Birthday Notes
+      allUsers.forEach(u => {
+        const item = document.createElement("div");
+        item.className = "note-item";
+        item.onclick = () => openChat(u.id, u.displayName, u.avatar, u.verified);
+        item.innerHTML = `
+          <div class="note-bubble-wrap">
+            <div class="note-bubble">
+              ${escapeHTML(u.note)}
+            </div>
+          </div>
+          <div class="note-avatar-wrapper">
+            <img class="note-avatar" src="${u.avatar}" onerror="this.src='https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/pfp.webp'" alt="${escapeHTML(u.displayName)}" />
+          </div>
+          <span class="note-label">${escapeHTML(u.displayName)}</span>
+        `;
+        notesTrayContainer.appendChild(item);
+      });
+    }
+
+    const chatListContainer = document.getElementById("chatListContainer");
+    const headerUnreadDot = document.getElementById("headerUnreadDot");
+
+    function truncateWords(text, maxWords = 3) {
+      if (!text) return "";
+      const words = text.trim().split(/\s+/);
+      if (words.length > maxWords) {
+        return words.slice(0, maxWords).join(" ") + "...";
+      }
+      return text.trim();
+    }
+
+    function getChatSnippet(u) {
+      const conv = conversations[u.id];
+      const msgs = conv ? conv.messages : (u.history || []);
+
+      const snippetParts = (u.snippet || "").split(" · ");
+      const snippetTime = snippetParts.length > 1 ? snippetParts[snippetParts.length - 1] : "";
+
+      if (!msgs || msgs.length === 0) {
+        return snippetTime ? `Active · ${snippetTime}` : "Active";
+      }
+
+      const lastMsg = msgs[msgs.length - 1];
+      let textPreview = (lastMsg.text || "").trim();
+      if (lastMsg.sender === "me" || lastMsg.sender === "you") {
+        textPreview = "You: " + textPreview;
+      }
+
+      if (u.isUnread) {
+        const count = msgs.length;
+        if (count === 1) {
+          // For 1 unread message: show short starting 3 words preview of actual message
+          const truncated = truncateWords(textPreview, 3);
+          return snippetTime ? `${truncated} · ${snippetTime}` : truncated;
+        } else if (count === 2) {
+          return snippetTime ? `2 new messages · ${snippetTime}` : "2 new messages";
+        } else if (count === 3) {
+          return snippetTime ? `3 new messages · ${snippetTime}` : "3 new messages";
+        } else if (count === 4) {
+          return snippetTime ? `4 new messages · ${snippetTime}` : "4 new messages";
+        } else {
+          return snippetTime ? `4+ new messages · ${snippetTime}` : "4+ new messages";
+        }
+      } else {
+        // Read chat -> preview actual last message
+        const truncated = truncateWords(textPreview, 3);
+        return snippetTime ? `${truncated} · ${snippetTime}` : truncated;
+      }
+    }
+
+    function renderChatList(usersToRender = allUsers) {
+      chatListContainer.innerHTML = "";
+
+      // Update header red dot based on whether any unread chats remain
+      const hasAnyUnread = allUsers.some(u => u.isUnread);
+      if (headerUnreadDot) {
+        headerUnreadDot.style.display = hasAnyUnread ? "inline-block" : "none";
+      }
+
+      usersToRender.forEach(u => {
+        const item = document.createElement("div");
+        item.className = `chat-item ${u.isUnread ? "unread" : ""}`;
+        item.onclick = () => openChat(u.id, u.displayName, u.avatar, u.verified);
+
+        const avatarMarkup = u.hasStoryRing
+          ? `<div class="chat-story-ring">
+              <div class="chat-story-gap">
+                <img class="chat-avatar" src="${u.avatar}" onerror="this.src='https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/pfp.webp'" alt="${escapeHTML(u.displayName)}" />
+              </div>
+            </div>`
+          : `<img class="chat-avatar" src="${u.avatar}" onerror="this.src='https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/pfp.webp'" alt="${escapeHTML(u.displayName)}" />`;
+
+        const verifiedBadgeMarkup = u.verified
+          ? `<span class="verified-badge">
+              <svg class="story-verified-badge" width="14" height="14" viewBox="0 0 40 40" fill="#0095f6"><path d="M19.998 3.094 14.638 0l-2.972 5.15H5.432v6.354L0 14.64 3.094 20 0 25.359l5.432 3.137v5.905h5.975L14.638 40l5.36-3.094L25.358 40l3.232-5.6h6.162v-6.01L40 25.359 36.905 20 40 14.641l-5.248-3.03v-6.46h-6.419L25.358 0l-5.36 3.094Zm7.415 11.225 2.254 2.287-11.43 11.5-6.835-6.93 2.244-2.258 4.587 4.581 9.18-9.18Z" fill="#0095f6"/></svg>
+            </span>`
+          : "";
+
+        const unreadIndicatorMarkup = u.isUnread
+          ? `<div class="unread-indicator-dot"></div>`
+          : "";
+
+        const pinMarkup = u.isPinned
+          ? `<svg aria-label="Pinned" class="pin-icon-inline" fill="currentColor" height="13" role="img" viewBox="0 0 24 24" width="13" style="color: #65676b; transform: rotate(45deg); display: inline-block; flex-shrink: 0; margin-left: 4px; vertical-align: middle;"><path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6l.8.8.8-.8v-6H18v-2l-2-2z"></path></svg>`
+          : "";
+
+        const snippetText = getChatSnippet(u);
+
+        item.innerHTML = `
+          <div class="chat-left">
+            <div class="chat-avatar-wrapper">
+              ${avatarMarkup}
+            </div>
+            <div class="chat-info">
+              <div class="chat-name-row">
+                <span class="chat-name">${escapeHTML(u.displayName)}</span>
+                ${verifiedBadgeMarkup}
+                ${pinMarkup}
+              </div>
+              <div class="chat-snippet-row">
+                <span class="chat-snippet">${escapeHTML(snippetText)}</span>
+              </div>
+            </div>
+          </div>
+          <div class="chat-right" style="display: flex; align-items: center;">
+            ${unreadIndicatorMarkup}
+          </div>
+        `;
+        chatListContainer.appendChild(item);
+      });
+    }
+
+    // --- INTERACTIVE DIRECT CHAT CONTROLLER ---
+    let activeChatKey = null;
+
+    const chatViewModal = document.getElementById("chatViewModal");
+    const modalUserAvatar = document.getElementById("modalUserAvatar");
+    const modalUserName = document.getElementById("modalUserName");
+    const chatMessagesContainer = document.getElementById("chatMessagesContainer");
+    const messageInput = document.getElementById("messageInput");
+    const chatInputActions = document.getElementById("chatInputActions");
+    const sendBtn = document.getElementById("sendBtn");
+
+    messageInput.addEventListener("input", () => {
+      const text = (messageInput.innerText || messageInput.textContent || "").trim();
+      if (text.length > 0) {
+        chatInputActions.style.display = "none";
+        sendBtn.classList.add("active");
+      } else {
+        chatInputActions.style.display = "flex";
+        sendBtn.classList.remove("active");
+      }
+    });
+
+    messageInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        sendMessage();
+      }
+    });
+
+    function openChat(key, name, avatar, verified) {
+      activeChatKey = key;
+
+      // Mark this chat as READ on view!
+      const user = allUsers.find(u => u.id === key);
+      if (user && user.isUnread) {
+        user.isUnread = false;
+        renderChatList();
+      }
+
+      if (!conversations[key]) {
+        conversations[key] = {
+          name: name || key,
+          avatar: avatar || "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/pfp.webp",
+          verified: !!verified,
+          status: "Active now",
+          messages: [
+            { sender: "other", text: "Happy Birthday Adity! 🎂🎉✨", hasAvatar: true }
+          ]
+        };
+      }
+
+      const conv = conversations[key];
+      modalUserAvatar.src = conv.avatar;
+      modalUserAvatar.onerror = () => { modalUserAvatar.src = "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/pfp.webp"; };
+      const nameStr = conv.name || "";
+      modalUserName.textContent = nameStr.length > 12 ? nameStr.slice(0, 12) + "..." : nameStr;
+
+      const modalVerifiedBadge = document.getElementById("modalVerifiedBadge");
+      if (modalVerifiedBadge) {
+        modalVerifiedBadge.innerHTML = conv.verified
+          ? `<svg class="story-verified-badge" width="14" height="14" viewBox="0 0 40 40" fill="#0095f6"><path d="M19.998 3.094 14.638 0l-2.972 5.15H5.432v6.354L0 14.64 3.094 20 0 25.359l5.432 3.137v5.905h5.975L14.638 40l5.36-3.094L25.358 40l3.232-5.6h6.162v-6.01L40 25.359 36.905 20 40 14.641l-5.248-3.03v-6.46h-6.419L25.358 0l-5.36 3.094Zm7.415 11.225 2.254 2.287-11.43 11.5-6.835-6.93 2.244-2.258 4.587 4.581 9.18-9.18Z" fill="#0095f6"/></svg>`
+          : "";
+      }
+
+      renderChatMessages();
+      chatViewModal.classList.add("active");
+      setTimeout(() => messageInput.focus(), 250);
+    }
+
+    function isOnlyEmojis(str) {
+      if (!str) return false;
+      const clean = str.replace(/\s+/g, '');
+      const emojiRegex = /^(\p{Extended_Pictographic}|\u200d|\uFE0F|\uFE0E|\uD83C[\uDFFB-\uDFFF])+$/u;
+      return emojiRegex.test(clean) && clean.length <= 12;
+    }
+
+    function renderChatMessages() {
+      chatMessagesContainer.innerHTML = "";
+      const conv = conversations[activeChatKey];
+      if (!conv) return;
+
+      const innerWrapper = document.createElement("div");
+      innerWrapper.className = "chat-messages-inner";
+
+      const timestampEl = document.createElement("div");
+      timestampEl.className = "chat-timestamp-divider";
+      timestampEl.textContent = "Today · 12:00 AM";
+      innerWrapper.appendChild(timestampEl);
+
+      const msgs = conv.messages;
+
+      msgs.forEach((msg, idx) => {
+        const isSent = msg.sender === "me";
+        const isEmoji = msg.isEmoji || isOnlyEmojis(msg.text);
+
+        const row = document.createElement("div");
+        row.className = `msg-row ${isSent ? "sent" : "received"}`;
+
+        if (!isSent) {
+          if (msg.hasAvatar || idx === msgs.length - 1 || (msgs[idx + 1] && msgs[idx + 1].sender === "me")) {
+            const av = document.createElement("img");
+            av.className = "msg-sender-avatar";
+            av.src = conv.avatar;
+            av.alt = conv.name;
+            av.onerror = () => { av.src = "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/pfp.webp"; };
+            row.appendChild(av);
+          } else {
+            const placeholder = document.createElement("div");
+            placeholder.className = "msg-avatar-placeholder";
+            row.appendChild(placeholder);
+          }
+        }
+
+        const bubbleContainer = document.createElement("div");
+        bubbleContainer.className = `msg-bubble-container ${isSent ? "sent" : "received"}`;
+
+        if (msg.replyTo) {
+          const replyBox = document.createElement("div");
+          replyBox.className = "msg-reply-box";
+          replyBox.innerHTML = `
+            <div class="msg-reply-label">You replied</div>
+            <div class="msg-reply-bubble">${escapeHTML(msg.replyTo)}</div>
+          `;
+          bubbleContainer.appendChild(replyBox);
+        }
+
+        const bubble = document.createElement("div");
+        bubble.className = `msg-bubble ${isEmoji ? "emoji-only" : ""}`;
+        bubble.textContent = msg.text;
+
+        bubbleContainer.appendChild(bubble);
+        row.appendChild(bubbleContainer);
+        innerWrapper.appendChild(row);
+      });
+
+      chatMessagesContainer.appendChild(innerWrapper);
+      chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+    }
+
+    function sendMessage() {
+      const text = (messageInput.innerText || messageInput.textContent || "").trim();
+      if (!text || !activeChatKey) return;
+
+      conversations[activeChatKey].messages.push({
+        sender: "me",
+        text: text
+      });
+
+      messageInput.innerHTML = "";
+      chatInputActions.style.display = "flex";
+      sendBtn.classList.remove("active");
+      renderChatMessages();
+      renderChatList();
+
+      setTimeout(() => {
+        if (activeChatKey && conversations[activeChatKey]) {
+          const replies = [
+            "Enjoy your special birthday to the fullest! 🎂❤️",
+            "Happy Birthday once again! Have lots of fun today! 🥳🎉",
+            "Stay blessed and keep smiling always! ✨💖",
+            "Party hard today! 🍰🥂",
+            "Sending you endless love and happiness on your birthday! 🎁🌸"
+          ];
+          const randomReply = replies[Math.floor(Math.random() * replies.length)];
+          conversations[activeChatKey].messages.push({
+            sender: "other",
+            text: randomReply,
+            hasAvatar: true
+          });
+          renderChatMessages();
+          renderChatList();
+        }
+      }, 1000);
+    }
+
+    function closeChat() {
+      chatViewModal.classList.remove("active");
+      activeChatKey = null;
+      renderChatList();
+    }
+
+    function openNewChatPrompt() {
+      const user = prompt("Enter username or search contact:", "10.13_mine");
+      if (user) {
+        const found = allUsers.find(u => u.id.toLowerCase() === user.toLowerCase() || u.name.toLowerCase() === user.toLowerCase());
+        if (found) {
+          openChat(found.id, found.displayName, found.avatar, found.verified);
+        } else {
+          openChat(user.toLowerCase().replace(/\s+/g, ""), user, "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/pfp.webp", false);
+        }
+      }
+    }
+
+    function createNewNote() {
+      const note = prompt("Share a thought (up to 60 characters):", "Celebrating my Birthday! 🎂✨");
+      if (note && note.trim().length > 0) {
+        document.getElementById("currentUserNoteBubble").innerText = note.trim();
+      }
+    }
+
+    function escapeHTML(str) {
+      if (!str) return "";
+      return String(str).replace(/[&<>'"]/g,
+        tag => ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          "'": '&#39;',
+          '"': '&quot;'
+        }[tag] || tag)
+      );
+    }
+
+    // Search filter for chats
+    document.getElementById("chatSearchInput").addEventListener("input", (e) => {
+      const term = e.target.value.toLowerCase().trim();
+      if (!term) {
+        renderChatList(allUsers);
+        return;
+      }
+      const filtered = allUsers.filter(u =>
+        u.name.toLowerCase().includes(term) ||
+        u.displayName.toLowerCase().includes(term) ||
+        u.snippet.toLowerCase().includes(term) ||
+        u.note.toLowerCase().includes(term)
+      );
+      renderChatList(filtered);
+    });
+
+    const chatModal = document.getElementById('chatViewModal');
+
+    function applyViewportHeight() {
+      if (window.visualViewport) {
+        const vvh = window.visualViewport.height;
+        const vvt = window.visualViewport.offsetTop;
+        chatModal.style.height = vvh + 'px';
+        chatModal.style.top = vvt + 'px';
+      }
+    }
+
+    function resetViewportHeight() {
+      chatModal.style.height = '';
+      chatModal.style.top = '';
+    }
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', () => {
+        if (chatModal.classList.contains('active')) {
+          applyViewportHeight();
+        }
+      });
+      window.visualViewport.addEventListener('scroll', () => {
+        if (chatModal.classList.contains('active')) {
+          applyViewportHeight();
+        }
+      });
+    }
+
+    renderNotesTray();
+    renderChatList();
+
+    // ─── Android Hardware Back Button Fix ───────────────────────────────────
+    // Push a dummy state so Android back doesn't instantly exit the app
+    history.pushState({ page: 'direct' }, '', window.location.href);
+
+    window.addEventListener('popstate', function () {
+      // Close chat modal if open (back = close chat, not exit app)
+      if (typeof chatModal !== 'undefined' && chatModal.classList.contains('active')) {
+        chatModal.classList.remove('active');
+        history.pushState({ page: 'direct' }, '', window.location.href);
+      } else {
+        // No overlay open — re-push to stay inside app
+        history.pushState({ page: 'direct' }, '', window.location.href);
+      }
+    });
+  </script>
+</body>
+
+</html>

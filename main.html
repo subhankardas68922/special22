@@ -1,0 +1,2848 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Instagram.com</title>
+  <link rel="icon" type="image/png" href="assets/favicon.webp">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#ffffff" />
+  <link rel="manifest" href="manifest.json" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Grand+Hotel&family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <style>
+    :root {
+      --font-family-system: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-family-apple: system-ui, -apple-system, BlinkMacSystemFont, ".SFNSText-Regular", sans-serif;
+      --font-family-segoe: Segoe UI Historic, Segoe UI, Helvetica, Arial, sans-serif;
+      --font-family-code: ui-monospace, Menlo, Consolas, Monaco, monospace;
+      --font-family-default: Helvetica, Arial, sans-serif;
+      --text-input-field-font-family: var(--font-family-system);
+      --ig-primary-background: #ffffff;
+      --ig-primary-text: #000000;
+      --ig-secondary-text: #737373;
+      --ig-stroke: #efefef;
+      --ig-link: #0095f6;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: #0d0d0d;
+      font-family: var(--font-family-system);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      min-height: 100dvh;
+    }
+
+    img {
+      border: 0;
+      -webkit-user-drag: none;
+      user-select: none;
+    }
+
+    .phone-container {
+      width: 100%;
+      height: 100vh;
+      height: 100dvh;
+      height: 100svh;
+      background-color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      /* Safe area support for Android/iOS notch & nav bar */
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+    }
+
+    @media (min-width: 768px) {
+      body {
+        background-color: #0d0d0d;
+      }
+
+      .phone-container {
+        max-width: 430px;
+        height: 92vh;
+        max-height: 920px;
+        border-radius: 36px;
+        border: 8px solid #222222;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+      }
+    }
+
+    /* Top Navigation Bar */
+    .top-bar {
+      position: sticky;
+      top: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: max(10px, env(safe-area-inset-top));
+      padding-bottom: 8px;
+      padding-left: max(16px, env(safe-area-inset-left));
+      padding-right: max(16px, env(safe-area-inset-right));
+      background: #fff;
+      z-index: 20;
+      flex-shrink: 0;
+      transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    .top-bar.hide-header {
+      transform: translateY(-100%);
+    }
+
+    .brand-logo {
+      font-family: 'Grand Hotel', cursive;
+      font-size: 28px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+
+      .brand-logo-img {
+        width: 150px;
+        height: 50px;
+        object-fit: contain;
+      }
+    }
+
+    .top-icons {
+      display: flex;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .top-icons svg,
+    .bottom-nav svg {
+      cursor: pointer;
+      display: block;
+    }
+
+    /* Stories Section */
+    .stories-container {
+      display: flex;
+      gap: 15px;
+      padding: 6px 10px 12px;
+      overflow-x: auto;
+
+      scrollbar-width: none;
+      flex-shrink: 0;
+      background: #fff;
+    }
+
+    .stories-container::-webkit-scrollbar {
+      display: none;
+    }
+
+    .story-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+      width: 89px;
+      cursor: pointer;
+    }
+
+    .avatar-wrapper {
+      position: relative;
+      width: 75px;
+      height: 75px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin: 5px 0;
+    }
+
+    .avatar-wrapper.your-story .avatar {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .avatar-ring {
+      width: 85px;
+      height: 85px;
+      border-radius: 50%;
+      padding: 3px;
+      background: linear-gradient(45deg,
+          #ffd600 0%,
+          #ffb300 12%,
+          #ff7a00 22%,
+          #ff3d3d 40%,
+          #ff006e 58%,
+          #d000ff 80%,
+          #ffd600 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin: 0;
+      box-shadow: 0 0 6px rgba(214, 41, 118, 0.35);
+    }
+
+    /* Middle circle: the white*/
+    .avatar-gap {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      padding: 2.5px;
+      background: var(--ig-primary-background, #ffffff);
+      display: flex;
+    }
+
+    /* Inner circle: the actual avatar image */
+    .avatar-ring .avatar {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .add-story-btn {
+      position: absolute;
+      bottom: 1px;
+      right: -2px;
+      z-index: 4;
+      background: #121212;
+      color: #ffffff;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2.5px solid #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 500;
+      font-size: 16px;
+      line-height: 1;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+    }
+
+    .story-username {
+      font-size: 12px;
+      font-weight: 400;
+      color: #000000;
+      font-family: var(--font-family-system);
+      letter-spacing: -0.2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 100%;
+      text-align: center;
+    }
+
+    /* Post Feed Section */
+    .feed {
+      flex: 1;
+      overflow-y: auto;
+      scrollbar-width: none;
+      background: #fff;
+      padding-top: 0;
+    }
+
+    .feed::-webkit-scrollbar {
+      display: none;
+    }
+
+    .post {
+
+      padding-bottom: 12px;
+    }
+
+    .post-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 11px 12px;
+    }
+
+    .post-user-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .post-avatar-ring {
+      padding: 2px;
+      border-radius: 50%;
+      background: linear-gradient(45deg,
+          #ffd600 0%,
+          #ffb300 12%,
+          #ff7a00 22%,
+          #ff3d3d 40%,
+          #ff006e 58%,
+          #d000ff 80%,
+          #ffd600 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .post-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      object-fit: cover;
+      display: block;
+    }
+
+    .post-details {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .post-username {
+      font-family: var(--font-family-system);
+      font-weight: 600;
+      font-size: 14.5px;
+      color: #000000;
+    }
+
+    .post-audio {
+      font-family: var(--font-family-system);
+      font-size: 12px;
+      color: #000000;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      max-width: 240px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.2;
+    }
+
+    .post-audio svg {
+      width: 15px;
+      height: 15px;
+      flex-shrink: 0;
+      display: inline-block;
+    }
+
+    /* Card Content */
+    .post-media-container {
+      width: 100%;
+      background-color: #fafafa;
+      position: relative;
+    }
+
+    .post-img {
+      width: 100%;
+      max-height: 520px;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* Romantic Post Card */
+    .post-card {
+      background: linear-gradient(180deg, #fdebf0 0%, #fcdbe4 100%);
+      padding: 30px 24px;
+      position: relative;
+      text-align: center;
+      color: #4a3e3e;
+      box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.6);
+      user-select: none;
+    }
+
+    .deco-heart {
+      position: absolute;
+      color: #ef5350;
+      opacity: 0.8;
+    }
+
+    .card-title-header {
+      margin-bottom: 16px;
+    }
+
+    .card-subhead {
+      font-family: 'Caveat', cursive;
+      font-size: 36px;
+      color: #2b1f1d;
+      line-height: 1;
+      font-weight: 700;
+    }
+
+    .card-main-title {
+      font-family: 'Caveat', cursive;
+      font-size: 48px;
+      color: #d81b60;
+      font-weight: 700;
+      line-height: 1.1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .card-body {
+      font-family: var(--font-family-default);
+      font-size: 13px;
+      line-height: 1.6;
+      color: #3a2e2e;
+    }
+
+    .card-body p {
+      margin-bottom: 12px;
+    }
+
+    .card-body .highlight {
+      color: #c2185b;
+      font-weight: 600;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 8px 0;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      width: 35px;
+      height: 1px;
+      background-color: #e91e63;
+      opacity: 0.4;
+    }
+
+    .divider span {
+      margin: 0 8px;
+      color: #e91e63;
+      font-size: 10px;
+    }
+
+    .floral-left,
+    .floral-right {
+      position: absolute;
+      width: 50px;
+      opacity: 0.85;
+    }
+
+    .floral-left {
+      bottom: 8px;
+      left: 8px;
+    }
+
+    .floral-right {
+      bottom: 8px;
+      right: 8px;
+      transform: scaleX(-1);
+    }
+
+    /* Action Bar */
+    .post-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px 6px;
+    }
+
+    .action-group {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .action-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+
+    .action-count {
+      font-family: var(--font-family-system);
+      font-size: 13px;
+      font-weight: 600;
+      color: #000000;
+    }
+
+    .action-icon {
+      cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+
+    .action-icon:active {
+      transform: scale(1.15);
+    }
+
+    .post-media-container {
+      position: relative;
+      width: 100%;
+      user-select: none;
+      cursor: pointer;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .post-audio-btn {
+      position: absolute;
+      bottom: 12px;
+      right: 12px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(38, 38, 38, 0.75);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      color: #ffffff;
+      cursor: pointer;
+      z-index: 20;
+      padding: 0;
+      transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.2s ease, opacity 0.2s ease;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .post-audio-btn:hover {
+      background: rgba(30, 30, 30, 0.9);
+      transform: scale(1.06);
+    }
+
+    .post-audio-btn:active {
+      transform: scale(0.9);
+    }
+
+    .post-audio-btn.playing {
+      background: rgba(38, 38, 38, 0.75);
+    }
+
+    .post-audio-btn svg {
+      width: 14px;
+      height: 14px;
+      fill: #ffffff;
+      pointer-events: none;
+      display: block;
+    }
+
+    /* Heart Animation from Double Tap */
+    .double-tap-heart {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      width: 90px;
+      height: 90px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 15;
+      filter: drop-shadow(0 4px 18px rgba(0, 0, 0, 0.45));
+      opacity: 0;
+    }
+
+    .double-tap-heart svg {
+      width: 100%;
+      height: 100%;
+      fill: #ffffff;
+    }
+
+    .double-tap-heart.animate-heart {
+      animation: instaHeartPop 0.85s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    @keyframes instaHeartPop {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0);
+      }
+
+      15% {
+        opacity: 0.95;
+        transform: translate(-50%, -50%) scale(1.2);
+      }
+
+      30% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(0.95);
+      }
+
+      45% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+
+      75% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1.15);
+      }
+    }
+
+    .like-btn {
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.15s ease;
+      cursor: pointer;
+    }
+
+    .like-btn.liked {
+      color: #ff3040 !important;
+      fill: #ff3040 !important;
+      animation: likeBtnPop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes likeBtnPop {
+      0% {
+        transform: scale(1);
+      }
+
+      40% {
+        transform: scale(1.35);
+      }
+
+      70% {
+        transform: scale(0.9);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .post-likes {
+      font-family: var(--font-family-system);
+      padding: 0 14px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #000000;
+      margin-bottom: 4px;
+    }
+
+    .post-caption-box {
+      font-family: var(--font-family-system);
+      padding: 0 14px;
+      font-size: 13px;
+      color: #000000;
+      line-height: 1.4;
+    }
+
+    .caption-username {
+      font-weight: 600;
+      margin-right: 6px;
+    }
+
+    .hashtag {
+      color: #3345e3;
+    }
+
+    .post-time {
+      font-family: var(--font-family-system);
+      padding: 4px 14px 0;
+      font-size: 10px;
+      color: #8e8e8e;
+    }
+
+    /* Infinite Scroll Loader Spinner */
+    .feed-loader {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      gap: 8px;
+    }
+
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #262626;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Bottom Navigation Bar */
+    .bottom-nav {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 10px 0 14px;
+      /* Pushes content above Android nav bar & iOS home indicator */
+      padding-bottom: max(14px, env(safe-area-inset-bottom));
+      background: #fff;
+      border-top: 1px solid #efefef;
+      z-index: 10;
+      flex-shrink: 0;
+      position: sticky;
+      bottom: 0;
+    }
+
+    .nav-avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .nav-item-wrapper {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .nav-red-dot {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background-color: #ff3040;
+      border-radius: 50%;
+      border: 1.5px solid #ffffff;
+      right: -3.5px;
+      bottom: 2px;
+      pointer-events: none;
+    }
+
+    /* Story Viewer with 3D Cube Perspective */
+    .story-viewer-modal {
+      position: absolute;
+      inset: 0;
+      z-index: 300;
+      background: #000000;
+      display: none;
+      overflow: hidden;
+      user-select: none;
+      touch-action: pan-y;
+      --cube-width: 430px;
+      --half-width: calc(var(--cube-width) / 2);
+      perspective: 1200px;
+      perspective-origin: 50% 50%;
+    }
+
+    .story-viewer-modal.active {
+      display: block;
+    }
+
+    .story-cube-stage {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      inset: 0;
+      perspective: 1200px;
+      perspective-origin: 50% 50%;
+      transform-style: preserve-3d;
+      overflow: hidden;
+    }
+
+    .story-cube-box {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      inset: 0;
+      transform-style: preserve-3d;
+      transform: translateZ(calc(-1 * var(--half-width))) rotateY(0deg);
+      will-change: transform;
+    }
+
+    .story-cube-face {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background: #000000;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      transform-style: preserve-3d;
+      overflow: hidden;
+    }
+
+    .story-cube-front {
+      transform: rotateY(0deg) translateZ(var(--half-width));
+    }
+
+    .story-cube-right {
+      transform: rotateY(90deg) translateZ(var(--half-width));
+    }
+
+    .story-cube-left {
+      transform: rotateY(-90deg) translateZ(var(--half-width));
+    }
+
+    .story-cube-shade {
+      position: absolute;
+      inset: 0;
+      background: #000000;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 312;
+      transition: opacity 0.05s linear;
+    }
+
+    .story-progress-container {
+      position: absolute;
+      top: max(14px, calc(env(safe-area-inset-top) + 8px));
+      left: 10px;
+      right: 10px;
+      display: flex;
+      gap: 4px;
+      z-index: 325;
+    }
+
+    .story-progress-bar {
+      flex: 1;
+      height: 2.5px;
+      background: rgba(255, 255, 255, 0.35);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .story-progress-fill {
+      height: 100%;
+      width: 0%;
+      background: #ffffff;
+      border-radius: 2px;
+    }
+
+    .story-viewer-header {
+      position: absolute;
+      top: max(26px, calc(env(safe-area-inset-top) + 20px));
+      left: 0;
+      right: 0;
+      padding: 6px 14px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 320;
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.25) 70%, transparent 100%);
+    }
+
+    .story-user-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      color: #fff;
+    }
+
+    .story-user-info-top {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .story-user-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1.5px solid rgba(255, 255, 255, 0.65);
+      flex-shrink: 0;
+    }
+
+    .story-username-text {
+      font-size: 14px;
+      font-weight: 600;
+      color: #ffffff;
+      letter-spacing: -0.1px;
+    }
+
+    .story-badge-wrap {
+      display: inline-flex;
+      align-items: center;
+      margin-left: 2px;
+    }
+
+    .story-time-text {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.7);
+      font-weight: 400;
+    }
+
+    .story-music-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: 42px;
+      margin-top: 1px;
+    }
+
+    .story-music-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 2px;
+      height: 12px;
+    }
+
+    .story-music-bars span {
+      display: block;
+      width: 2.5px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 2px;
+      animation: musicBar 0.8s ease-in-out infinite alternate;
+    }
+
+    .story-music-bars span:nth-child(1) {
+      height: 6px;
+      animation-delay: 0s;
+    }
+
+    .story-music-bars span:nth-child(2) {
+      height: 12px;
+      animation-delay: 0.15s;
+    }
+
+    .story-music-bars span:nth-child(3) {
+      height: 8px;
+      animation-delay: 0.3s;
+    }
+
+    @keyframes musicBar {
+      0% {
+        opacity: 0.5;
+        transform: scaleY(0.6);
+      }
+
+      100% {
+        opacity: 1;
+        transform: scaleY(1);
+      }
+    }
+
+    .story-music-name {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.88);
+      font-weight: 400;
+      max-width: 200px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .story-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .story-sound-btn {
+      background: transparent;
+      border: none;
+      color: #ffffff;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+      opacity: 0.95;
+      transition: opacity 0.15s ease, transform 0.15s ease;
+    }
+
+    .story-sound-btn:active {
+      transform: scale(0.9);
+    }
+
+    .story-options-btn {
+      background: transparent;
+      border: none;
+      color: #ffffff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+      opacity: 0.9;
+    }
+
+    .story-media-image {
+      width: 100%;
+      height: 100%;
+      object-fit: contain !important;
+      background: #000000 !important;
+      position: absolute;
+      inset: 0;
+      z-index: 301;
+      display: block;
+      transition: opacity 0.18s ease;
+    }
+
+    .story-media-video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain !important;
+      background: #000000 !important;
+      position: absolute;
+      inset: 0;
+      z-index: 301;
+      display: none;
+    }
+
+    .story-spinner {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 34px;
+      height: 34px;
+      border: 3px solid rgba(255, 255, 255, 0.2);
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      animation: storySpin 0.7s linear infinite;
+      z-index: 305;
+      display: none;
+      pointer-events: none;
+    }
+
+    @keyframes storySpin {
+      to { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    .story-tap-area {
+      position: absolute;
+      top: max(80px, calc(env(safe-area-inset-top) + 75px));
+      bottom: max(85px, calc(env(safe-area-inset-bottom) + 75px));
+      z-index: 315;
+      cursor: pointer;
+    }
+
+    .story-tap-left {
+      left: 0;
+      width: 40%;
+    }
+
+    .story-tap-right {
+      right: 0;
+      width: 60%;
+    }
+
+    .story-viewer-footer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 320;
+      padding: 12px 14px max(20px, calc(env(safe-area-inset-bottom) + 14px));
+      background: linear-gradient(0deg, rgba(0, 0, 0, 0.72) 0%, rgba(0, 0, 0, 0.38) 60%, rgba(0, 0, 0, 0) 100%);
+    }
+
+    .story-reply-input {
+      flex: 1;
+      height: 42px;
+      border-radius: 22px;
+      border: 1.5px solid rgba(255, 255, 255, 0.35);
+      background: rgba(0, 0, 0, 0.12);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      padding: 0 18px;
+      color: #ffffff;
+      font-size: 14px;
+      outline: none;
+      font-family: var(--font-family-system);
+    }
+
+    .story-reply-input::placeholder {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 14px;
+    }
+
+    .story-footer-icons {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-shrink: 0;
+    }
+
+    .story-action-btn {
+      background: transparent;
+      border: none;
+      color: #ffffff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .story-action-btn:active {
+      transform: scale(0.85);
+    }
+
+    .story-like-btn.liked {
+      color: #ff3040 !important;
+    }
+
+    .story-like-btn.liked svg {
+      fill: #ff3040 !important;
+      color: #ff3040 !important;
+      animation: likeBtnPop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="phone-container">
+    <!-- Top Header -->
+    <header class="top-bar">
+      <!-- New Post SVG Icon -->
+      <svg aria-label="New Post" fill="currentColor" height="24" role="img" viewBox="0 0 24 24" width="24">
+        <title>New Post</title>
+        <path d="M21 11h-8V3a1 1 0 1 0-2 0v8H3a1 1 0 1 0 0 2h8v8a1 1 0 1 0 2 0v-8h8a1 1 0 1 0 0-2Z"></path>
+      </svg>
+
+      <div class="brand-logo">
+        <svg aria-label="Instagram" class="x1lliihq x1n2onr6 x5n08af" fill="currentColor" height="40" role="img"
+          viewBox="0 0 600 140" width="140">
+          <title>Instagram</title>
+          <polygon points="0 106.31 15.08 106.31 15.08 8.46 0 11.82 0 106.31"></polygon>
+          <path
+            d="M116.77,35.06h0c-5.3,19.69-12.18,38.75-20.69,56.21-1.6,3.2-2.88,4.33-4.65,4.33-1.6,0-2.73-.96-2.73-3.36v-28.03c0-17.78-9.14-29.95-26.14-29.95-8.83,0-16.2,4.16-20.21,11.69v-10.25h-14.28v70.62h14.28v-40.84c0-11.05,7.06-19.37,16.84-19.37,9.13,0,15.23,6.57,15.23,19.22v27.23c0,10.09,5.61,15.05,15.72,15.06,8.34,0,13.47-3.53,17.48-11.69,6.74-13.94,12.83-29.63,17.32-45.33,8.18,14.73,21.97,21.94,21.97,33.47,0,5.93-4.01,11.86-13.63,11.86-5.3,0-10.11-2.4-13.31-5.13l-5.77,11.53c4.01,3.04,11.55,5.6,19.09,5.6,17.32,0,27.43-10.73,27.43-24.19,0-19.06-23.42-29.47-28.23-48.68h-15.72Z">
+          </path>
+          <path
+            d="M201.46,92.08c-2.72,1.76-5.12,2.56-7.85,2.56h0c-4.97-.01-7.7-3.05-7.7-8.34v-37.79h16.52v-12.81h-16.52V14.72l-14.28,3.04v17.94h-14.59v12.81h14.59v40.2c0,10.88,7.22,18.58,19.89,18.58,6.73,0,11.55-1.92,15.55-4.48h0s0,0,0,0h0s0,0,0,0l-5.6-10.71Z">
+          </path>
+          <path
+            d="M575.46,34.23c-9.95,0-17.98,4.32-21.82,12.01-3.85-7.52-11.22-12.01-21.33-12.01-8.18,0-15.07,3.69-18.6,10.26v-8.81h-14.28v70.63h14.28v-44.51c0-8.97,6.41-15.7,15.23-15.7,8.02,0,13.63,5.44,13.63,16.01v44.2h14.28v-44.52c0-8.97,6.1-15.7,15.08-15.7,8.02,0,13.79,5.44,13.79,16.01v44.2h14.28v-45.49c0-15.86-8.82-26.58-24.54-26.58Z">
+          </path>
+          <path
+            d="M263.52,43.37c-5.93-6.09-14.12-9.29-23.26-9.29-19.09,0-33.2,16.01-33.2,36.83s14.12,36.99,33.2,36.99c9.46,0,17.49-3.85,23.26-10.09v8.49h14.28V35.69h-14.28v7.69ZM242.35,95.42c-11.71,0-21.17-9.61-21.17-24.5s9.62-24.34,21.17-24.34,21.17,9.45,21.17,24.34-9.46,24.5-21.17,24.5Z">
+          </path>
+          <path
+            d="M472.66,43.37h-.01c-5.93-6.09-14.12-9.29-23.26-9.29-19.09,0-33.2,16.01-33.2,36.83,0,6.39,1.32,12.32,3.68,17.47-4.5,4.85-9.42,7.04-14.74,7.04-8.19,0-13.47-4.97-13.47-15.05s5.61-21.95,18.12-32.36l-6.41-12.33h-36.72v12.81h25.98c-8.98,9.93-14.76,22.42-14.76,33.79,0,16.5,10.91,25.63,25.82,25.63,8.6,0,16.92-3.83,22.41-10.14,5.88,6.33,14,10.14,23.3,10.14,9.3,0,17.49-3.85,23.26-10.09v8.49h14.28V35.69h-14.28v7.69ZM451.49,95.42c-11.71,0-21.17-9.61-21.17-24.5s9.62-24.34,21.17-24.34c11.55,0,21.17,9.45,21.17,24.34s-9.46,24.5-21.17,24.5Z">
+          </path>
+          <path
+            d="M344.18,43.36c-5.93-6.09-13.96-9.29-22.93-9.29-18.92,0-33.52,15.53-33.52,36.99,0,19.06,12.04,33.79,28.23,36.36-7.38,4.32-10.75,8.98-10.75,16.02,0,10.09,8.34,18.1,23.26,18.1,19.72,0,29.99-13.46,29.99-30.91V35.67h-14.28v7.69ZM344.18,112.08c0,11.69-6.9,17.13-14.92,17.13-7.22,0-10.59-4.17-10.59-8.49s2.73-9.77,14.76-15.21c4.17-1.92,7.87-4.49,10.75-7.69v14.26ZM323.02,95.42c-11.7,0-21.17-9.61-21.17-24.5,0-14.89,9.62-24.34,21.17-24.34,11.55,0,21.17,9.45,21.17,24.34s-9.46,24.5-21.17,24.5Z">
+          </path>
+      </div>
+
+      <div class="top-icons">
+        <!-- Notifications SVG Icon -->
+        <svg aria-label="Notification" fill="currentColor" height="24" role="img" viewBox="0 0 24 24" width="24">
+          <title>Notifications </title>
+          <path
+            d="M16.792 3.904A4.989 4.989 0 0 1 21.5 9.122c0 3.072-2.652 4.959-5.197 7.222-2.512 2.243-3.865 3.469-4.303 3.752-.477-.309-2.143-1.823-4.303-3.752C5.141 14.072 2.5 12.167 2.5 9.122a4.989 4.989 0 0 1 4.708-5.218 4.21 4.21 0 0 1 3.675 1.941c.84 1.175.98 1.763 1.12 1.763s.278-.588 1.11-1.766a4.17 4.17 0 0 1 3.679-1.938m0-2a6.04 6.04 0 0 0-4.797 2.127 6.052 6.052 0 0 0-4.787-2.127A6.985 6.985 0 0 0 .5 9.122c0 3.61 2.55 5.827 5.015 7.97.283.246.569.494.853.747l1.027.918a44.998 44.998 0 0 0 3.518 3.018 2 2 0 0 0 2.174 0 45.263 45.263 0 0 0 3.626-3.115l.922-.824c.293-.26.59-.519.885-.774 2.334-2.025 4.98-4.32 4.98-7.94a6.985 6.985 0 0 0-6.708-7.218Z">
+          </path>
+        </svg>
+      </div>
+    </header>
+
+    <main class="feed" id="feed">
+      <!-- Stories Bar -->
+      <section class="stories-container" id="storiesContainer">
+        <div class="story-item">
+          <div class="avatar-wrapper your-story">
+            <img class="avatar" src="https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/pfp.webp" alt="Your story" />
+            <div class="add-story-btn">+</div>
+          </div>
+          <span class="story-username">Your story</span>
+        </div>
+      </section>
+
+      <!-- Loader Spinner -->
+      <div class="feed-loader" id="feedLoader">
+        <div class="spinner"></div>
+      </div>
+    </main>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="bottom-nav">
+      <!-- Home SVG -->
+      <a href="main.html" aria-label="Home" style="color: inherit; text-decoration: none;">
+        <svg aria-label="Home" fill="currentColor" height="24" role="img" viewBox="0 0 24 24" width="24">
+          <title>Home</title>
+          <path
+            d="m21.762 8.786-7-6.68a3.994 3.994 0 0 0-5.524 0l-7 6.681A4.017 4.017 0 0 0 1 11.68V19c0 2.206 1.794 4 4 4h3.005a1 1 0 0 0 1-1v-7.003a2.997 2.997 0 0 1 5.994 0V22a1 1 0 0 0 1 1H19c2.206 0 4-1.794 4-4v-7.32a4.02 4.02 0 0 0-1.238-2.894Z">
+          </path>
+        </svg>
+      </a>
+
+      <!-- Reels SVG -->
+      <a href="reel.html" aria-label="Reels" style="color: inherit; text-decoration: none;">
+        <svg aria-label="Reels" fill="currentColor" height="24" role="img" viewBox="0 0 24 24" width="24">
+          <title>Reels</title>
+          <path
+            d="M22.935 7.468c-.063-1.36-.307-2.142-.512-2.67a5.341 5.341 0 0 0-1.27-1.95 5.345 5.345 0 0 0-1.95-1.27c-.53-.206-1.311-.45-2.672-.513C15.333 1.012 14.976 1 12 1s-3.333.012-4.532.065c-1.36.063-2.142.307-2.67.512-.77.298-1.371.69-1.95 1.27a5.36 5.36 0 0 0-1.27 1.95c-.206.53-.45 1.311-.513 2.672C1.012 8.667 1 9.024 1 12s.012 3.333.065 4.532c.063 1.36.307 2.142.512 2.67.297.77.69 1.372 1.27 1.95.58.581 1.181.974 1.95 1.27.53.206 1.311.45 2.672.513C8.667 22.988 9.024 23 12 23s3.333-.012 4.532-.065c1.36-.063 2.142-.307 2.67-.512a5.33 5.33 0 0 0 1.95-1.27 5.356 5.356 0 0 0 1.27-1.95c.206-.53.45-1.311.513-2.672.053-1.198.065-1.555.065-4.531s-.012-3.333-.065-4.532Zm-1.998 8.972c-.05 1.07-.228 1.652-.38 2.04-.197.51-.434.874-.82 1.258a3.362 3.362 0 0 1-1.258.82c-.387.151-.97.33-2.038.379-1.162.052-1.51.063-4.441.063s-3.28-.01-4.44-.063c-1.07-.05-1.652-.228-2.04-.38a3.354 3.354 0 0 1-1.258-.82 3.362 3.362 0 0 1-.82-1.258c-.151-.387-.33-.97-.379-2.038C3.011 15.28 3 14.931 3 12s.01-3.28.063-4.44c.05-1.07.228-1.652.38-2.04.197-.51.434-.875.82-1.26a3.372 3.372 0 0 1 1.258-.819c.387-.15.97-.329 2.038-.378C8.72 3.011 9.069 3 12 3s3.28.01 4.44.063c1.07.05 1.652.228 2.04.38.51.197.874.433 1.258.82.385.382.622.747.82 1.258.151.387.33.97.379 2.038C20.989 8.72 21 9.069 21 12s-.01 3.28-.063 4.44Zm-4.584-6.828-5.25-3a2.725 2.725 0 0 0-2.745.01A2.722 2.722 0 0 0 6.988 9v6c0 .992.512 1.88 1.37 2.379.432.25.906.376 1.38.376.468 0 .937-.123 1.365-.367l5.25-3c.868-.496 1.385-1.389 1.385-2.388s-.517-1.892-1.385-2.388Zm-.993 3.04-5.25 3a.74.74 0 0 1-.748-.003.74.74 0 0 1-.374-.649V9a.74.74 0 0 1 .374-.65.737.737 0 0 1 .748-.002l5.25 3c.341.196.378.521.378.652s-.037.456-.378.651Z">
+          </path>
+        </svg>
+      </a>
+
+      <!-- Redirect to direct.html -->
+      <a href="direct.html" class="nav-item-wrapper" aria-label="Direct Messages"
+        style="color: inherit; text-decoration: none;">
+        <svg class="action-icon" aria-label="Direct" width="24" height="24" viewBox="0 0 24 24" role="img">
+          <path
+            d="M13.973 20.046 21.77 6.928C22.8 5.195 21.55 3 19.535 3H4.466C2.138 3 .984 5.825 2.646 7.456l4.842 4.752 1.723 7.121c.548 2.266 3.571 2.721 4.762.717Z"
+            fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="2"></path>
+          <line fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            x1="7.488" x2="15.515" y1="12.208" y2="7.641"></line>
+        </svg>
+        <div class="nav-red-dot"></div>
+      </a>
+
+      <!-- Search -->
+      <a href="search.html" aria-label="Search" style="color: inherit; text-decoration: none;">
+        <svg aria-label="Search" fill="none" stroke="currentColor" stroke-width="2.2" height="24" role="img"
+          viewBox="0 0 24 24" width="24">
+          <title>Search</title>
+          <path d="M19 10.5A8.5 8.5 0 1 1 10.5 2a8.5 8.5 0 0 1 8.5 8.5Z"></path>
+          <line x1="16.5" y1="16.5" x2="22" y2="22" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" />
+        </svg>
+      </a>
+
+      <div class="nav-item-wrapper">
+        <img class="nav-avatar" src="https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/pfp.webp" alt="Profile" />
+        <div class="nav-red-dot"></div>
+      </div>
+    </nav>
+
+    <!-- Fullscreen 3D Cube -->
+    <div class="story-viewer-modal" id="storyViewerModal">
+      <div class="story-cube-stage" id="storyCubeStage">
+        <div class="story-cube-box" id="storyCubeBox">
+          <!-- Front face yah Current Story -->
+          <div class="story-cube-face story-cube-front" id="storyCubeFront">
+            <div class="story-progress-container"></div>
+            <div class="story-viewer-header">
+              <div class="story-user-info">
+                <div class="story-user-info-top">
+                  <img class="story-user-avatar" src="" alt="Story User" />
+                  <span class="story-username-text"></span>
+                  <span class="story-badge-wrap"></span>
+                  <span class="story-time-text"></span>
+                </div>
+              </div>
+              <div class="story-header-actions">
+                <button class="story-sound-btn" aria-label="Audio">
+                  <svg class="story-sound-icon" width="18" height="18" viewBox="0 0 24 24" fill="#ffffff">
+                    <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3c-.55 0-1 .45-1 1v4c0 .55.45 1 1 1h4l5 5c.67.65 1.77.18 1.77-.75v-3.67l3.96 3.96c-.56.43-1.18.77-1.73 1.01v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73 4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
+                  </svg>
+                </button>
+                <button class="story-options-btn" aria-label="Options">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="#ffffff">
+                    <circle cx="12" cy="4" r="2.25" />
+                    <circle cx="12" cy="12" r="2.25" />
+                    <circle cx="12" cy="20" r="2.25" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <img class="story-media-image" src="" alt="Story Media" />
+            <video class="story-media-video" src="" playsinline webkit-playsinline preload="auto"></video>
+            <div class="story-spinner"></div>
+            <div class="story-cube-shade"></div>
+            <div class="story-viewer-footer">
+              <input type="text" class="story-reply-input" placeholder="Send message" autocomplete="off"
+                autocorrect="off" autocapitalize="sentences" spellcheck="false" data-lpignore="true"
+                data-form-type="other" />
+              <div class="story-footer-icons">
+                <button class="story-action-btn story-like-btn">
+                  <svg aria-label="Like" fill="currentColor" height="24" role="img" viewBox="0 0 24 24" width="24">
+                    <path
+                      d="M16.792 3.904A4.989 4.989 0 0 1 21.5 9.122c0 3.072-2.652 4.959-5.197 7.222-2.512 2.243-3.865 3.469-4.303 3.752-.477-.309-2.143-1.823-4.303-3.752C5.141 14.072 2.5 12.167 2.5 9.122a4.989 4.989 0 0 1 4.708-5.218 4.21 4.21 0 0 1 3.675 1.941c.84 1.175.98 1.763 1.12 1.763s.278-.588 1.11-1.766a4.17 4.17 0 0 1 3.679-1.938m0-2a6.04 6.04 0 0 0-4.797 2.127 6.052 6.052 0 0 0-4.787-2.127A6.985 6.985 0 0 0 .5 9.122c0 3.61 2.55 5.827 5.015 7.97.283.246.569.494.853.747l1.027.918a44.998 44.998 0 0 0 3.518 3.018 2 2 0 0 0 2.174 0 45.263 45.263 0 0 0 3.626-3.115l.922-.824c.293-.26.59-.519.885-.774 2.334-2.025 4.98-4.32 4.98-7.94a6.985 6.985 0 0 0-6.708-7.218Z">
+                    </path>
+                  </svg>
+                </button>
+                <button class="story-action-btn story-share-btn" onclick="window.location.href='direct.html'">
+                  <svg aria-label="Share" fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="2"
+                    height="24" viewBox="0 0 24 24" width="24">
+                    <path
+                      d="M13.973 20.046 21.77 6.928C22.8 5.195 21.55 3 19.535 3H4.466C2.138 3 .984 5.825 2.646 7.456l4.842 4.752 1.723 7.121c.548 2.266 3.571 2.721 4.762.717Z">
+                    </path>
+                    <line stroke-linecap="round" x1="7.488" x2="15.515" y1="12.208" y2="7.641"></line>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right face yah Next story -->
+          <div class="story-cube-face story-cube-right" id="storyCubeRight">
+            <div class="story-progress-container"></div>
+            <div class="story-viewer-header">
+              <div class="story-user-info">
+                <div class="story-user-info-top">
+                  <img class="story-user-avatar" src="" alt="Story User" />
+                  <span class="story-username-text"></span>
+                  <span class="story-badge-wrap"></span>
+                  <span class="story-time-text"></span>
+                </div>
+              </div>
+              <div class="story-header-actions">
+                <button class="story-sound-btn" aria-label="Audio">
+                  <svg class="story-sound-icon" width="18" height="18" viewBox="0 0 24 24" fill="#ffffff">
+                    <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3c-.55 0-1 .45-1 1v4c0 .55.45 1 1 1h4l5 5c.67.65 1.77.18 1.77-.75v-3.67l3.96 3.96c-.56.43-1.18.77-1.73 1.01v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73 4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
+                  </svg>
+                </button>
+                <button class="story-options-btn" aria-label="Options">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="#ffffff">
+                    <circle cx="12" cy="4" r="2.25" />
+                    <circle cx="12" cy="12" r="2.25" />
+                    <circle cx="12" cy="20" r="2.25" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <img class="story-media-image" src="" alt="Story Media" />
+            <video class="story-media-video" src="" playsinline webkit-playsinline preload="auto"></video>
+            <div class="story-spinner"></div>
+            <div class="story-cube-shade"></div>
+            <div class="story-viewer-footer">
+              <input type="text" class="story-reply-input" placeholder="Send message" autocomplete="off"
+                autocorrect="off" autocapitalize="sentences" spellcheck="false" data-lpignore="true"
+                data-form-type="other" />
+              <div class="story-footer-icons">
+                <button class="story-action-btn story-like-btn">
+                  <svg aria-label="Like" fill="currentColor" height="24" role="img" viewBox="0 0 24 24" width="24">
+                    <path
+                      d="M16.792 3.904A4.989 4.989 0 0 1 21.5 9.122c0 3.072-2.652 4.959-5.197 7.222-2.512 2.243-3.865 3.469-4.303 3.752-.477-.309-2.143-1.823-4.303-3.752C5.141 14.072 2.5 12.167 2.5 9.122a4.989 4.989 0 0 1 4.708-5.218 4.21 4.21 0 0 1 3.675 1.941c.84 1.175.98 1.763 1.12 1.763s.278-.588 1.11-1.766a4.17 4.17 0 0 1 3.679-1.938m0-2a6.04 6.04 0 0 0-4.797 2.127 6.052 6.052 0 0 0-4.787-2.127A6.985 6.985 0 0 0 .5 9.122c0 3.61 2.55 5.827 5.015 7.97.283.246.569.494.853.747l1.027.918a44.998 44.998 0 0 0 3.518 3.018 2 2 0 0 0 2.174 0 45.263 45.263 0 0 0 3.626-3.115l.922-.824c.293-.26.59-.519.885-.774 2.334-2.025 4.98-4.32 4.98-7.94a6.985 6.985 0 0 0-6.708-7.218Z">
+                    </path>
+                  </svg>
+                </button>
+                <button class="story-action-btn story-share-btn" onclick="window.location.href='direct.html'">
+                  <svg aria-label="Share" fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="2"
+                    height="24" viewBox="0 0 24 24" width="24">
+                    <path
+                      d="M13.973 20.046 21.77 6.928C22.8 5.195 21.55 3 19.535 3H4.466C2.138 3 .984 5.825 2.646 7.456l4.842 4.752 1.723 7.121c.548 2.266 3.571 2.721 4.762.717Z">
+                    </path>
+                    <line stroke-linecap="round" x1="7.488" x2="15.515" y1="12.208" y2="7.641"></line>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Left face yah previous story -->
+          <div class="story-cube-face story-cube-left" id="storyCubeLeft">
+            <div class="story-progress-container"></div>
+            <div class="story-viewer-header">
+              <div class="story-user-info">
+                <div class="story-user-info-top">
+                  <img class="story-user-avatar" src="" alt="Story User" />
+                  <span class="story-username-text"></span>
+                  <span class="story-badge-wrap"></span>
+                  <span class="story-time-text"></span>
+                </div>
+              </div>
+              <div class="story-header-actions">
+                <button class="story-sound-btn" aria-label="Audio">
+                  <svg class="story-sound-icon" width="18" height="18" viewBox="0 0 24 24" fill="#ffffff">
+                    <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3c-.55 0-1 .45-1 1v4c0 .55.45 1 1 1h4l5 5c.67.65 1.77.18 1.77-.75v-3.67l3.96 3.96c-.56.43-1.18.77-1.73 1.01v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73 4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
+                  </svg>
+                </button>
+                <button class="story-options-btn" aria-label="Options">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="#ffffff">
+                    <circle cx="12" cy="4" r="2.25" />
+                    <circle cx="12" cy="12" r="2.25" />
+                    <circle cx="12" cy="20" r="2.25" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <img class="story-media-image" src="" alt="Story Media" />
+            <video class="story-media-video" src="" playsinline webkit-playsinline preload="auto"></video>
+            <div class="story-spinner"></div>
+            <div class="story-cube-shade"></div>
+            <div class="story-viewer-footer">
+              <input type="text" class="story-reply-input" placeholder="Send message" autocomplete="off"
+                autocorrect="off" autocapitalize="sentences" spellcheck="false" data-lpignore="true"
+                data-form-type="other" />
+              <div class="story-footer-icons">
+                <button class="story-action-btn story-like-btn">
+                  <svg aria-label="Like" fill="currentColor" height="24" role="img" viewBox="0 0 24 24" width="24">
+                    <path
+                      d="M16.792 3.904A4.989 4.989 0 0 1 21.5 9.122c0 3.072-2.652 4.959-5.197 7.222-2.512 2.243-3.865 3.469-4.303 3.752-.477-.309-2.143-1.823-4.303-3.752C5.141 14.072 2.5 12.167 2.5 9.122a4.989 4.989 0 0 1 4.708-5.218 4.21 4.21 0 0 1 3.675 1.941c.84 1.175.98 1.763 1.12 1.763s.278-.588 1.11-1.766a4.17 4.17 0 0 1 3.679-1.938m0-2a6.04 6.04 0 0 0-4.797 2.127 6.052 6.052 0 0 0-4.787-2.127A6.985 6.985 0 0 0 .5 9.122c0 3.61 2.55 5.827 5.015 7.97.283.246.569.494.853.747l1.027.918a44.998 44.998 0 0 0 3.518 3.018 2 2 0 0 0 2.174 0 45.263 45.263 0 0 0 3.626-3.115l.922-.824c.293-.26.59-.519.885-.774 2.334-2.025 4.98-4.32 4.98-7.94a6.985 6.985 0 0 0-6.708-7.218Z">
+                    </path>
+                  </svg>
+                </button>
+                <button class="story-action-btn story-share-btn" onclick="window.location.href='direct.html'">
+                  <svg aria-label="Share" fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="2"
+                    height="24" viewBox="0 0 24 24" width="24">
+                    <path
+                      d="M13.973 20.046 21.77 6.928C22.8 5.195 21.55 3 19.535 3H4.466C2.138 3 .984 5.825 2.646 7.456l4.842 4.752 1.723 7.121c.548 2.266 3.571 2.721 4.762.717Z">
+                    </path>
+                    <line stroke-linecap="round" x1="7.488" x2="15.515" y1="12.208" y2="7.641"></line>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tap or Gesture Area Overlay -->
+      <div class="story-tap-area story-tap-left" id="storyTapLeft"></div>
+      <div class="story-tap-area story-tap-right" id="storyTapRight"></div>
+    </div>
+  </div>
+
+  <script>
+    // --- STORIES DATASET ---
+    const storiesData = [
+      { username: "10.13_mine", time: "3h", verified: true, media: "https://raw.githubusercontent.com/subhankardas68922/stories/main/stories/02.webp" },
+      { username: "subhankar.das_", time: "1h", verified: true, media: "https://raw.githubusercontent.com/subhankardas68922/stories/main/stories/01.webm" },
+      { username: "youknowsamael", time: "5h", verified: false, media: "https://raw.githubusercontent.com/subhankardas68922/stories/main/stories/03.webp" },
+      { username: "subhankar0724", time: "8h", verified: false, media: "https://raw.githubusercontent.com/subhankardas68922/stories/main/stories/04.webp" },
+      { username: "tomholland2013", time: "12h", verified: true, media: "https://raw.githubusercontent.com/subhankardas68922/stories/main/stories/05.webp" },
+      { username: "arijitsingh", time: "2h", verified: true, media: "https://raw.githubusercontent.com/subhankardas68922/stories/main/stories/06.webp" },
+      { username: "disney", time: "20h", verified: true, media: "https://raw.githubusercontent.com/subhankardas68922/stories/main/stories/07.webp" },
+      { username: "flynnrider", time: "9h", verified: true, media: "https://raw.githubusercontent.com/subhankardas68922/stories/main/stories/08.webp" },
+      { username: "rapunzel", time: "10h", verified: true, media: "https://raw.githubusercontent.com/subhankardas68922/stories/main/stories/09.webp" },
+
+    ];
+
+    const getAvatarForUser = (username) => {
+      if (username === "subhankar.das_") {
+        return "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/subhankar.das_.webp";
+      }
+      if (username.toLowerCase() === "youknowsamael") {
+        return "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/youknowsamael.webp";
+      }
+      if (username.toLowerCase() === "tomholland2013") {
+        return "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/tomholland2013.webp";
+      }
+      return `https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/pfp/${username}.webp`;
+    };
+
+    storiesData.forEach(item => {
+      item.avatar = getAvatarForUser(item.username);
+    });
+
+    const storiesContainer = document.getElementById("storiesContainer");
+
+    // Add click event to "Your Story" first item
+    const yourStoryItem = storiesContainer.querySelector(".story-item");
+    if (yourStoryItem) {
+      yourStoryItem.addEventListener("click", () => openStory(0, 0));
+    }
+
+    storiesData.forEach((item, idx) => {
+      const storyDiv = document.createElement("div");
+      storyDiv.className = "story-item";
+      storyDiv.innerHTML = `
+        <div class="avatar-ring">
+          <div class="avatar-gap">
+            <img class="avatar" src="${item.avatar}" alt="${item.username}" />
+          </div>
+        </div>
+        <span class="story-username">${item.username}</span>
+      `;
+      storyDiv.addEventListener("click", () => openStory(idx, 0));
+      storiesContainer.appendChild(storyDiv);
+    });
+
+    // --- HEART & SOUND SVG PATHS ---
+    const OUTLINE_HEART_PATH = `<path d="M16.792 3.904A4.989 4.989 0 0 1 21.5 9.122c0 3.072-2.652 4.959-5.197 7.222-2.512 2.243-3.865 3.469-4.303 3.752-.477-.309-2.143-1.823-4.303-3.752C5.141 14.072 2.5 12.167 2.5 9.122a4.989 4.989 0 0 1 4.708-5.218 4.21 4.21 0 0 1 3.675 1.941c.84 1.175.98 1.763 1.12 1.763s.278-.588 1.11-1.766a4.17 4.17 0 0 1 3.679-1.938m0-2a6.04 6.04 0 0 0-4.797 2.127 6.052 6.052 0 0 0-4.787-2.127A6.985 6.985 0 0 0 .5 9.122c0 3.61 2.55 5.827 5.015 7.97.283.246.569.494.853.747l1.027.918a44.998 44.998 0 0 0 3.518 3.018 2 2 0 0 0 2.174 0 45.263 45.263 0 0 0 3.626-3.115l.922-.824c.293-.26.59-.519.885-.774 2.334-2.025 4.98-4.32 4.98-7.94a6.985 6.985 0 0 0-6.708-7.218Z"></path>`;
+    const FILLED_HEART_PATH = `<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path>`;
+    const SOUND_UNMUTED_SVG = `<path d="M14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77zm-2.5-1.73L6.83 6H3c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h3.83l4.67 4.5c.67.65 1.77.18 1.77-.75V2.25c0-.93-1.1-1.4-1.77-.75zM14 8.83v6.34c1.17-.54 2-1.75 2-3.17s-.83-2.63-2-3.17z"/>`;
+    const SOUND_MUTED_SVG = `<path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3c-.55 0-1 .45-1 1v4c0 .55.45 1 1 1h4l5 5c.67.65 1.77.18 1.77-.75v-3.67l3.96 3.96c-.56.43-1.18.77-1.73 1.01v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73 4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>`;
+
+    // --- 3D CUBE STORY VIEWER CONTROLLER ---
+    let currentStoryIndex = 0;
+    let currentSlideIndex = 0;
+    let storyProgressInterval = null;
+    let storyProgressPercent = 0;
+    let isCubeAnimating = false;
+    let isStoryMuted = false;
+    const IMAGE_STORY_DURATION = 5000; // 5 seconds per image
+
+    const storyViewerModal = document.getElementById("storyViewerModal");
+    const storyCubeStage = document.getElementById("storyCubeStage");
+    const storyCubeBox = document.getElementById("storyCubeBox");
+    const storyCubeFront = document.getElementById("storyCubeFront");
+    const storyCubeRight = document.getElementById("storyCubeRight");
+    const storyCubeLeft = document.getElementById("storyCubeLeft");
+
+    const frontShade = storyCubeFront.querySelector(".story-cube-shade");
+    const rightShade = storyCubeRight.querySelector(".story-cube-shade");
+    const leftShade = storyCubeLeft.querySelector(".story-cube-shade");
+
+    function updateCubeDimensions() {
+      const width = storyViewerModal.offsetWidth || 414;
+      storyViewerModal.style.setProperty("--cube-width", `${width}px`);
+    }
+    window.addEventListener("resize", updateCubeDimensions);
+
+    function isVideoMedia(src) {
+      if (!src) return false;
+      const cleanSrc = src.toLowerCase().split("?")[0];
+      return cleanSrc.endsWith(".mp4") || cleanSrc.endsWith(".webm") || cleanSrc.endsWith(".mov") || cleanSrc.endsWith(".ogg");
+    }
+
+    function resolveStoryMediaUrl(url) {
+      if (!url) return "";
+      const isLocal = window.location.protocol === "file:" ||
+                      window.location.hostname === "localhost" ||
+                      window.location.hostname === "127.0.0.1";
+      if (isLocal) {
+        const filename = url.split("/").pop().split("?")[0];
+        return `New folder/stories/${filename}`;
+      }
+      return url;
+    }
+
+    function getAlternateMediaSrc(url) {
+      if (!url) return "";
+      const filename = url.split("/").pop().split("?")[0];
+      if (url.includes("raw.githubusercontent.com")) {
+        return `New folder/stories/${filename}`;
+      } else {
+        return `https://raw.githubusercontent.com/subhankardas68922/stories/main/stories/${filename}`;
+      }
+    }
+
+    // Preload image cache to eliminate delay / stale image display
+    const preloadedMediaCache = {};
+    function preloadAllStoryMedia() {
+      storiesData.forEach(story => {
+        const slides = getStorySlides(story);
+        slides.forEach(src => {
+          const resolved = resolveStoryMediaUrl(src);
+          if (!isVideoMedia(resolved)) {
+            const img = new Image();
+            img.src = resolved;
+            img.onerror = () => {
+              const alt = getAlternateMediaSrc(resolved);
+              if (alt !== resolved) img.src = alt;
+            };
+            preloadedMediaCache[resolved] = img;
+          }
+        });
+      });
+    }
+    preloadAllStoryMedia();
+
+    function updateStorySoundIcon() {
+      document.querySelectorAll(".story-sound-btn").forEach(btn => {
+        const svg = btn.querySelector("svg");
+        if (svg) {
+          svg.innerHTML = isStoryMuted ? SOUND_MUTED_SVG : SOUND_UNMUTED_SVG;
+        }
+      });
+    }
+
+    document.querySelectorAll(".story-sound-btn").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        isStoryMuted = !isStoryMuted;
+        updateStorySoundIcon();
+        const activeVideo = storyCubeFront.querySelector(".story-media-video");
+        if (activeVideo) {
+          activeVideo.muted = isStoryMuted;
+        }
+      });
+    });
+
+    function getStorySlides(story) {
+      if (!story) return [];
+      if (Array.isArray(story.media)) return story.media;
+      return [story.media || story.avatar];
+    }
+
+    function getNextStoryTarget() {
+      const story = storiesData[currentStoryIndex];
+      if (!story) return null;
+      const slides = getStorySlides(story);
+      if (currentSlideIndex < slides.length - 1) {
+        return { userIndex: currentStoryIndex, slideIndex: currentSlideIndex + 1 };
+      } else if (currentStoryIndex < storiesData.length - 1) {
+        return { userIndex: currentStoryIndex + 1, slideIndex: 0 };
+      }
+      return null;
+    }
+
+    function getPrevStoryTarget() {
+      if (currentSlideIndex > 0) {
+        return { userIndex: currentStoryIndex, slideIndex: currentSlideIndex - 1 };
+      } else if (currentStoryIndex > 0) {
+        const prevStory = storiesData[currentStoryIndex - 1];
+        const prevSlides = getStorySlides(prevStory);
+        return { userIndex: currentStoryIndex - 1, slideIndex: prevSlides.length - 1 };
+      }
+      return null;
+    }
+
+    function renderStoryFace(faceEl, userIndex, slideIndex = 0) {
+      if (userIndex < 0 || userIndex >= storiesData.length) {
+        faceEl.style.visibility = "hidden";
+        return;
+      }
+      faceEl.style.visibility = "visible";
+
+      const story = storiesData[userIndex];
+      const slides = getStorySlides(story);
+      if (slideIndex < 0) slideIndex = 0;
+      if (slideIndex >= slides.length) slideIndex = slides.length - 1;
+
+      // Render progress bars
+      const progressContainer = faceEl.querySelector(".story-progress-container");
+      progressContainer.innerHTML = "";
+      slides.forEach((_, i) => {
+        const bar = document.createElement("div");
+        bar.className = "story-progress-bar";
+        const fill = document.createElement("div");
+        fill.className = "story-progress-fill";
+        if (i < slideIndex) {
+          fill.style.width = "100%";
+        } else {
+          fill.style.width = "0%";
+        }
+        bar.appendChild(fill);
+        progressContainer.appendChild(bar);
+      });
+
+      // User info
+      faceEl.querySelector(".story-user-avatar").src = story.avatar;
+      faceEl.querySelector(".story-username-text").textContent = story.username;
+      faceEl.querySelector(".story-time-text").textContent = story.time || "7h";
+
+      // Music name — pull from matching post if available
+      const musicNameEl = faceEl.querySelector(".story-music-name");
+      if (musicNameEl) {
+        const matchPost = postsData.find(p => p.username.toLowerCase() === story.username.toLowerCase());
+        musicNameEl.textContent = matchPost ? matchPost.audio : "";
+      }
+
+      const badgeWrap = faceEl.querySelector(".story-badge-wrap");
+      if (story.verified) {
+        badgeWrap.innerHTML = `<svg class="story-verified-badge" width="15" height="15" viewBox="0 0 40 40" fill="#ffffff"><path d="M19.998 3.094 14.638 0l-2.972 5.15H5.432v6.354L0 14.64 3.094 20 0 25.359l5.432 3.137v5.905h5.975L14.638 40l5.36-3.094L25.358 40l3.232-5.6h6.162v-6.01L40 25.359 36.905 20 40 14.641l-5.248-3.03v-6.46h-6.419L25.358 0l-5.36 3.094Zm7.415 11.225 2.254 2.287-11.43 11.5-6.835-6.93 2.244-2.258 4.587 4.581 9.18-9.18Z" fill="#ffffff"/></svg>`;
+      } else {
+        badgeWrap.innerHTML = "";
+      }
+
+      // Media
+      const imgEl = faceEl.querySelector(".story-media-image");
+      const videoEl = faceEl.querySelector(".story-media-video");
+      const spinner = faceEl.querySelector(".story-spinner");
+      const soundBtn = faceEl.querySelector(".story-sound-btn");
+      const rawMediaSrc = slides[slideIndex];
+      const currentMediaSrc = resolveStoryMediaUrl(rawMediaSrc);
+      const isVideo = isVideoMedia(currentMediaSrc);
+
+      if (isVideo) {
+        if (soundBtn) soundBtn.style.display = "flex";
+        imgEl.style.display = "none";
+        imgEl.removeAttribute("src");
+        imgEl.removeAttribute("data-src");
+        imgEl.style.opacity = "0";
+
+        videoEl.style.display = "block";
+        videoEl.muted = isStoryMuted;
+        if (videoEl.getAttribute("data-src") !== currentMediaSrc) {
+          videoEl.setAttribute("data-src", currentMediaSrc);
+          videoEl.src = currentMediaSrc;
+          videoEl.load();
+        }
+        videoEl.currentTime = 0;
+      } else {
+        if (soundBtn) soundBtn.style.display = "none";
+        videoEl.pause();
+        videoEl.style.display = "none";
+        videoEl.removeAttribute("src");
+        videoEl.removeAttribute("data-src");
+
+        imgEl.style.display = "block";
+        if (imgEl.getAttribute("data-src") !== currentMediaSrc) {
+          imgEl.setAttribute("data-src", currentMediaSrc);
+          const cached = preloadedMediaCache[currentMediaSrc];
+          if (cached && cached.complete && cached.naturalWidth > 0) {
+            imgEl.style.opacity = "1";
+            if (spinner && faceEl === storyCubeFront) spinner.style.display = "none";
+          } else {
+            // Hide previous photo immediately so stale image never shows
+            imgEl.style.opacity = "0";
+            if (spinner && faceEl === storyCubeFront) spinner.style.display = "block";
+          }
+
+          imgEl.src = currentMediaSrc;
+          imgEl.onload = () => {
+            imgEl.style.opacity = "1";
+            if (spinner && faceEl === storyCubeFront) spinner.style.display = "none";
+          };
+          imgEl.onerror = () => {
+            const fallback = getAlternateMediaSrc(currentMediaSrc);
+            if (imgEl.src !== fallback && !imgEl.src.endsWith(fallback)) {
+              imgEl.src = fallback;
+            }
+          };
+        } else {
+          imgEl.style.opacity = "1";
+          if (spinner && faceEl === storyCubeFront) spinner.style.display = "none";
+        }
+      }
+
+      // Like state for this story face
+      const likeBtn = faceEl.querySelector(".story-like-btn");
+      if (likeBtn) {
+        const svg = likeBtn.querySelector("svg");
+        if (story.liked) {
+          likeBtn.classList.add("liked");
+          if (svg) svg.innerHTML = FILLED_HEART_PATH;
+        } else {
+          likeBtn.classList.remove("liked");
+          if (svg) svg.innerHTML = OUTLINE_HEART_PATH;
+        }
+      }
+    }
+
+    function prepareAdjacentFaces() {
+      const nextTarget = getNextStoryTarget();
+      if (nextTarget) {
+        renderStoryFace(storyCubeRight, nextTarget.userIndex, nextTarget.slideIndex);
+        storyCubeRight.style.visibility = "visible";
+      } else {
+        storyCubeRight.style.visibility = "hidden";
+      }
+
+      const prevTarget = getPrevStoryTarget();
+      if (prevTarget) {
+        renderStoryFace(storyCubeLeft, prevTarget.userIndex, prevTarget.slideIndex);
+        storyCubeLeft.style.visibility = "visible";
+      } else {
+        storyCubeLeft.style.visibility = "hidden";
+      }
+    }
+
+    function pauseActiveMedia() {
+      clearInterval(storyProgressInterval);
+      const video = storyCubeFront.querySelector(".story-media-video");
+      if (video && !video.paused) {
+        video.pause();
+      }
+    }
+
+    function resumeActiveMedia() {
+      const story = storiesData[currentStoryIndex];
+      if (!story) return;
+      const slides = getStorySlides(story);
+      const currentMediaSrc = resolveStoryMediaUrl(slides[currentSlideIndex]);
+
+      if (isVideoMedia(currentMediaSrc)) {
+        const video = storyCubeFront.querySelector(".story-media-video");
+        if (video && video.paused) {
+          video.play().catch(() => {});
+        }
+      } else {
+        const remainingDuration = Math.max(400, ((100 - storyProgressPercent) / 100) * IMAGE_STORY_DURATION);
+        startStoryProgress(remainingDuration, storyProgressPercent);
+      }
+    }
+
+    function playActiveMedia() {
+      clearInterval(storyProgressInterval);
+      storyProgressPercent = 0;
+
+      const story = storiesData[currentStoryIndex];
+      if (!story) return;
+      const slides = getStorySlides(story);
+      const currentMediaSrc = resolveStoryMediaUrl(slides[currentSlideIndex]);
+
+      const imgEl = storyCubeFront.querySelector(".story-media-image");
+      const videoEl = storyCubeFront.querySelector(".story-media-video");
+      const spinner = storyCubeFront.querySelector(".story-spinner");
+      const fills = storyCubeFront.querySelectorAll(".story-progress-fill");
+      const activeFill = fills[currentSlideIndex];
+
+      if (isVideoMedia(currentMediaSrc)) {
+        imgEl.style.display = "none";
+        videoEl.style.display = "block";
+        if (spinner) spinner.style.display = "block";
+
+        videoEl.ontimeupdate = null;
+        videoEl.onended = null;
+        videoEl.onwaiting = null;
+        videoEl.onplaying = null;
+        videoEl.onerror = null;
+
+        videoEl.muted = isStoryMuted;
+        videoEl.currentTime = 0;
+
+        let hasInitiatedPlayback = false;
+        const initiateVideoPlayback = () => {
+          if (hasInitiatedPlayback) return;
+          hasInitiatedPlayback = true;
+
+          const playPromise = videoEl.play();
+          if (playPromise !== undefined) {
+            playPromise.then(() => {
+              if (spinner) spinner.style.display = "none";
+            }).catch(err => {
+              // Browser blocked audio autoplay -> auto-mute and retry immediately
+              videoEl.muted = true;
+              isStoryMuted = true;
+              updateStorySoundIcon();
+              videoEl.play().then(() => {
+                if (spinner) spinner.style.display = "none";
+              }).catch(e => {
+                console.warn("Video playback completely failed:", e);
+                if (spinner) spinner.style.display = "none";
+                setTimeout(() => cubeRollTo("next"), 2500);
+              });
+            });
+          }
+        };
+
+        const getSafeDuration = () => {
+          if (videoEl.duration && isFinite(videoEl.duration) && videoEl.duration > 0) {
+            return videoEl.duration;
+          }
+          return 12.85; // Known exact duration for 01.webm
+        };
+
+        videoEl.onwaiting = () => {
+          if (spinner) spinner.style.display = "block";
+        };
+
+        videoEl.onplaying = () => {
+          if (spinner) spinner.style.display = "none";
+        };
+
+        // PROGRESS IS STRICTLY SYNCHRONIZED TO REAL VIDEO PLAYBACK
+        videoEl.ontimeupdate = () => {
+          if (spinner && !videoEl.paused) spinner.style.display = "none";
+          const dur = getSafeDuration();
+          if (dur > 0 && activeFill) {
+            const pct = Math.min((videoEl.currentTime / dur) * 100, 100);
+            activeFill.style.width = `${pct}%`;
+          }
+        };
+
+        videoEl.onended = () => {
+          if (activeFill) activeFill.style.width = "100%";
+          cubeRollTo("next");
+        };
+
+        videoEl.onerror = () => {
+          const fallback = getAlternateMediaSrc(currentMediaSrc);
+          if (videoEl.src !== fallback && !videoEl.src.endsWith(fallback)) {
+            videoEl.src = fallback;
+            videoEl.load();
+            initiateVideoPlayback();
+          } else {
+            if (spinner) spinner.style.display = "none";
+            setTimeout(() => cubeRollTo("next"), 2500);
+          }
+        };
+
+        if (videoEl.readyState >= 2) {
+          initiateVideoPlayback();
+        } else {
+          videoEl.oncanplay = () => {
+            videoEl.oncanplay = null;
+            initiateVideoPlayback();
+          };
+          setTimeout(() => {
+            if (videoEl.paused) initiateVideoPlayback();
+          }, 800);
+        }
+      } else {
+        // IMAGE STORY
+        videoEl.pause();
+        videoEl.style.display = "none";
+        imgEl.style.display = "block";
+
+        const startImageCountdown = () => {
+          if (spinner) spinner.style.display = "none";
+          imgEl.style.opacity = "1";
+          startStoryProgress(IMAGE_STORY_DURATION, 0);
+        };
+
+        if (imgEl.complete && imgEl.naturalWidth > 0) {
+          startImageCountdown();
+        } else {
+          if (spinner) spinner.style.display = "block";
+          imgEl.onload = () => {
+            startImageCountdown();
+          };
+          imgEl.onerror = () => {
+            const alt = getAlternateMediaSrc(currentMediaSrc);
+            if (imgEl.src !== alt && !imgEl.src.endsWith(alt)) {
+              imgEl.src = alt;
+            } else {
+              startImageCountdown();
+            }
+          };
+          setTimeout(() => {
+            if (storyViewerModal.classList.contains("active") && !storyProgressInterval) {
+              startImageCountdown();
+            }
+          }, 1500);
+        }
+      }
+    }
+
+    function startStoryProgress(duration = IMAGE_STORY_DURATION, initialPercent = 0) {
+      clearInterval(storyProgressInterval);
+      storyProgressPercent = initialPercent;
+
+      const fills = storyCubeFront.querySelectorAll(".story-progress-fill");
+      const activeFill = fills[currentSlideIndex];
+      if (activeFill) {
+        activeFill.style.width = `${Math.min(storyProgressPercent, 100)}%`;
+      }
+
+      const stepTime = 50;
+      const stepIncrement = (stepTime / duration) * (100 - initialPercent);
+
+      storyProgressInterval = setInterval(() => {
+        storyProgressPercent += stepIncrement;
+        if (activeFill) {
+          activeFill.style.width = `${Math.min(storyProgressPercent, 100)}%`;
+        }
+
+        if (storyProgressPercent >= 100) {
+          clearInterval(storyProgressInterval);
+          cubeRollTo("next");
+        }
+      }, stepTime);
+    }
+
+    function cubeRollTo(direction) {
+      if (isCubeAnimating) return;
+
+      if (direction === "next") {
+        const nextTarget = getNextStoryTarget();
+        if (!nextTarget) {
+          closeStoryViewer();
+          return;
+        }
+
+        isCubeAnimating = true;
+        pauseActiveMedia();
+
+        // Preload Right Face
+        renderStoryFace(storyCubeRight, nextTarget.userIndex, nextTarget.slideIndex);
+
+        // 3D Cube Rotation to -90deg
+        storyCubeBox.style.transition = "transform 0.38s cubic-bezier(0.25, 1, 0.5, 1)";
+        storyCubeBox.style.transform = "translateZ(calc(-1 * var(--half-width))) rotateY(-90deg)";
+
+        frontShade.style.transition = "opacity 0.38s cubic-bezier(0.25, 1, 0.5, 1)";
+        rightShade.style.transition = "opacity 0.38s cubic-bezier(0.25, 1, 0.5, 1)";
+        frontShade.style.opacity = "0.7";
+        rightShade.style.opacity = "0";
+
+        setTimeout(() => {
+          currentStoryIndex = nextTarget.userIndex;
+          currentSlideIndex = nextTarget.slideIndex;
+
+          renderStoryFace(storyCubeFront, currentStoryIndex, currentSlideIndex);
+
+          // Reset cube box rotation seamlessly
+          storyCubeBox.style.transition = "none";
+          storyCubeBox.style.transform = "translateZ(calc(-1 * var(--half-width))) rotateY(0deg)";
+
+          frontShade.style.transition = "none";
+          rightShade.style.transition = "none";
+          leftShade.style.transition = "none";
+          frontShade.style.opacity = "0";
+          rightShade.style.opacity = "0.7";
+          leftShade.style.opacity = "0.7";
+
+          prepareAdjacentFaces();
+          isCubeAnimating = false;
+          playActiveMedia();
+        }, 380);
+      } else if (direction === "prev") {
+        const prevTarget = getPrevStoryTarget();
+        if (!prevTarget) {
+          // Bounce effect when at first story
+          storyCubeBox.style.transition = "transform 0.22s cubic-bezier(0.25, 1, 0.5, 1)";
+          storyCubeBox.style.transform = "translateZ(calc(-1 * var(--half-width))) rotateY(14deg)";
+          setTimeout(() => {
+            storyCubeBox.style.transform = "translateZ(calc(-1 * var(--half-width))) rotateY(0deg)";
+          }, 220);
+          return;
+        }
+
+        isCubeAnimating = true;
+        pauseActiveMedia();
+
+        // Preload Left Face
+        renderStoryFace(storyCubeLeft, prevTarget.userIndex, prevTarget.slideIndex);
+
+        // 3D Cube Rotation to +90deg
+        storyCubeBox.style.transition = "transform 0.38s cubic-bezier(0.25, 1, 0.5, 1)";
+        storyCubeBox.style.transform = "translateZ(calc(-1 * var(--half-width))) rotateY(90deg)";
+
+        frontShade.style.transition = "opacity 0.38s cubic-bezier(0.25, 1, 0.5, 1)";
+        leftShade.style.transition = "opacity 0.38s cubic-bezier(0.25, 1, 0.5, 1)";
+        frontShade.style.opacity = "0.7";
+        leftShade.style.opacity = "0";
+
+        setTimeout(() => {
+          currentStoryIndex = prevTarget.userIndex;
+          currentSlideIndex = prevTarget.slideIndex;
+
+          renderStoryFace(storyCubeFront, currentStoryIndex, currentSlideIndex);
+
+          // Reset cube box rotation seamlessly
+          storyCubeBox.style.transition = "none";
+          storyCubeBox.style.transform = "translateZ(calc(-1 * var(--half-width))) rotateY(0deg)";
+
+          frontShade.style.transition = "none";
+          rightShade.style.transition = "none";
+          leftShade.style.transition = "none";
+          frontShade.style.opacity = "0";
+          rightShade.style.opacity = "0.7";
+          leftShade.style.opacity = "0.7";
+
+          prepareAdjacentFaces();
+          isCubeAnimating = false;
+          playActiveMedia();
+        }, 380);
+      }
+    }
+
+    function openStory(userIndex, slideIdx = 0) {
+      stopAllFeedAudio();
+      if (userIndex < 0 || userIndex >= storiesData.length) return;
+      currentStoryIndex = userIndex;
+      currentSlideIndex = slideIdx;
+
+      updateCubeDimensions();
+
+      storyCubeBox.style.transition = "none";
+      storyCubeBox.style.transform = "translateZ(calc(-1 * var(--half-width))) rotateY(0deg)";
+
+      frontShade.style.transition = "none";
+      rightShade.style.transition = "none";
+      leftShade.style.transition = "none";
+      frontShade.style.opacity = "0";
+      rightShade.style.opacity = "0.7";
+      leftShade.style.opacity = "0.7";
+
+      updateStorySoundIcon();
+      renderStoryFace(storyCubeFront, currentStoryIndex, currentSlideIndex);
+      prepareAdjacentFaces();
+
+      storyViewerModal.classList.add("active");
+      playActiveMedia();
+    }
+
+    function closeStoryViewer() {
+      pauseActiveMedia();
+      storyViewerModal.classList.remove("active");
+      [storyCubeFront, storyCubeRight, storyCubeLeft].forEach(face => {
+        const v = face.querySelector(".story-media-video");
+        if (v) {
+          v.pause();
+          v.currentTime = 0;
+          v.removeAttribute("src");
+          v.removeAttribute("data-src");
+          v.load();
+        }
+      });
+    }
+
+    // Interactive gestures: Live 3D Cube Drag & Tap Navigation
+    let isPointerDown = false;
+    let hasMoved = false;
+    let startX = 0;
+    let startY = 0;
+    let startTime = 0;
+
+    function handlePointerDown(e) {
+      if (isCubeAnimating) return;
+      if (e.target.closest(".story-options-btn") || e.target.closest(".story-sound-btn") || e.target.closest(".story-viewer-footer")) {
+        return;
+      }
+      isPointerDown = true;
+      hasMoved = false;
+      startX = e.clientX || (e.touches && e.touches[0].clientX) || 0;
+      startY = e.clientY || (e.touches && e.touches[0].clientY) || 0;
+      startTime = Date.now();
+      pauseActiveMedia();
+    }
+
+    function handlePointerMove(e) {
+      if (!isPointerDown || isCubeAnimating) return;
+      const currentX = e.clientX || (e.touches && e.touches[0].clientX) || 0;
+      const currentY = e.clientY || (e.touches && e.touches[0].clientY) || 0;
+      const dx = currentX - startX;
+      const dy = currentY - startY;
+
+      if (!hasMoved && (Math.abs(dx) > 6 || Math.abs(dy) > 6)) {
+        hasMoved = true;
+      }
+
+      if (hasMoved) {
+        const modalWidth = storyViewerModal.offsetWidth || 414;
+        let angle = (dx / modalWidth) * 90;
+
+        // Rubberband resistance if boundary
+        const nextTarget = getNextStoryTarget();
+        const prevTarget = getPrevStoryTarget();
+        if (angle < 0 && !nextTarget) {
+          angle = angle * 0.22;
+        } else if (angle > 0 && !prevTarget) {
+          angle = angle * 0.22;
+        }
+
+        storyCubeBox.style.transition = "none";
+        storyCubeBox.style.transform = `translateZ(calc(-1 * var(--half-width))) rotateY(${angle}deg)`;
+
+        const ratio = Math.min(Math.abs(angle) / 90, 1);
+        frontShade.style.transition = "none";
+        rightShade.style.transition = "none";
+        leftShade.style.transition = "none";
+        frontShade.style.opacity = (ratio * 0.7).toString();
+        if (angle < 0) {
+          rightShade.style.opacity = ((1 - ratio) * 0.7).toString();
+          leftShade.style.opacity = "0.7";
+        } else {
+          leftShade.style.opacity = ((1 - ratio) * 0.7).toString();
+          rightShade.style.opacity = "0.7";
+        }
+      }
+    }
+
+    function handlePointerUp(e) {
+      if (!isPointerDown) return;
+      isPointerDown = false;
+      const endX = e.clientX || (e.changedTouches && e.changedTouches[0].clientX) || startX;
+      const endY = e.clientY || (e.changedTouches && e.changedTouches[0].clientY) || startY;
+      const dx = endX - startX;
+      const dy = endY - startY;
+      const dt = Date.now() - startTime;
+      const modalWidth = storyViewerModal.offsetWidth || 414;
+
+      if (hasMoved) {
+        // Swipe down to dismiss
+        if (dy > 80 && Math.abs(dy) > Math.abs(dx) * 1.5) {
+          closeStoryViewer();
+          return;
+        }
+
+        const threshold = modalWidth * 0.18;
+        const isQuickFlick = dt < 280 && Math.abs(dx) > 35;
+
+        if ((dx < -threshold || (isQuickFlick && dx < 0)) && getNextStoryTarget()) {
+          cubeRollTo("next");
+        } else if ((dx > threshold || (isQuickFlick && dx > 0)) && getPrevStoryTarget()) {
+          cubeRollTo("prev");
+        } else {
+          // Snap back to 0
+          storyCubeBox.style.transition = "transform 0.28s cubic-bezier(0.25, 1, 0.5, 1)";
+          storyCubeBox.style.transform = "translateZ(calc(-1 * var(--half-width))) rotateY(0deg)";
+          frontShade.style.transition = "opacity 0.28s cubic-bezier(0.25, 1, 0.5, 1)";
+          rightShade.style.transition = "opacity 0.28s cubic-bezier(0.25, 1, 0.5, 1)";
+          leftShade.style.transition = "opacity 0.28s cubic-bezier(0.25, 1, 0.5, 1)";
+          frontShade.style.opacity = "0";
+          rightShade.style.opacity = "0.7";
+          leftShade.style.opacity = "0.7";
+          setTimeout(() => {
+            resumeActiveMedia();
+          }, 280);
+        }
+      } else {
+        // Did not drag: was it a long press (hold-to-pause) or a quick tap?
+        if (dt > 350) {
+          // Press & hold released -> simply resume
+          resumeActiveMedia();
+        } else {
+          // Quick tap navigation
+          const rect = storyViewerModal.getBoundingClientRect();
+          const relX = endX - rect.left;
+          if (relX < rect.width * 0.35) {
+            cubeRollTo("prev");
+          } else {
+            cubeRollTo("next");
+          }
+        }
+      }
+    }
+
+    storyViewerModal.addEventListener("mousedown", handlePointerDown);
+    window.addEventListener("mousemove", handlePointerMove);
+    window.addEventListener("mouseup", handlePointerUp);
+
+    storyViewerModal.addEventListener("touchstart", handlePointerDown, { passive: true });
+    window.addEventListener("touchmove", handlePointerMove, { passive: true });
+    window.addEventListener("touchend", handlePointerUp);
+    window.addEventListener("touchcancel", handlePointerUp);
+
+    // Bind options button to close story viewer
+    document.querySelectorAll(".story-options-btn").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        closeStoryViewer();
+      });
+    });
+
+    function toggleStoryLike(btn) {
+      const isLiked = btn.classList.contains("liked");
+      const story = storiesData[currentStoryIndex];
+      const svg = btn.querySelector("svg");
+
+      if (!isLiked) {
+        btn.classList.add("liked");
+        if (story) story.liked = true;
+        if (svg) svg.innerHTML = FILLED_HEART_PATH;
+      } else {
+        btn.classList.remove("liked");
+        if (story) story.liked = false;
+        if (svg) svg.innerHTML = OUTLINE_HEART_PATH;
+      }
+    }
+
+    document.querySelectorAll(".story-like-btn").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        toggleStoryLike(btn);
+      });
+    });
+
+    document.querySelectorAll(".story-reply-input").forEach(input => {
+      input.addEventListener("mousedown", e => e.stopPropagation());
+      input.addEventListener("touchstart", e => e.stopPropagation());
+      input.addEventListener("click", e => e.stopPropagation());
+    });
+
+    // --- POSTS DATASET (24 Posts) ---
+    const postsData = [
+      {
+        "type": "image",
+        "username": "subhankar.das_",
+        "audio": "Pritam, Arijit Singh \u00b7 Kesariya",
+        "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/38/4c/5c/384c5c8f-3ff8-e457-b2f7-3158ce108649/mzaf_12389299033886433185.plus.aac.p.m4a",
+        "image": "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/post/01.webp",
+        "likes": "843",
+        "likesShort": "843",
+        "comments": 24,
+        "shares": 67,
+        "caption": "Even the moon fades away in front of your traditional beauty! Your gentle smile steals my heart every time \u2728 \u2764\ufe0f <span class='hashtag'>#TraditionalLove #SareeLook #MyLove</span>",
+        "time": "3 sec ago"
+      },
+      {
+        "type": "image",
+        "username": "subhankar0724",
+        "audio": "Ed Sheeran \u00b7 Perfect",
+        "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/c7/ba/bc/c7babc66-f598-aaa6-bcf6-307281795817/mzaf_16337361235117168274.plus.aac.p.m4a",
+        "image": "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/post/02.webp",
+        "likes": "1,482",
+        "likesShort": "1.5K",
+        "comments": 89,
+        "shares": 204,
+        "caption": "Happy Birthday Day to the girl who brightens up my whole universe! Every day with you feels like a sweet dream \ud83c\udf38 \ud83d\udc9e <span class='hashtag'>#BirthdayDay #MyForeverLove #CoupleGoals</span>",
+        "time": "10 sec ago"
+      },
+      {
+        "type": "image",
+        "username": "Youknowsamael",
+        "audio": "Stephen Sanchez \u00b7 Until I Found You",
+        "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/53/82/c1/5382c1d4-ddba-aa2b-90df-57268895fac9/mzaf_8926201202931541051.plus.aac.p.m4a",
+        "image": "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/post/03.webp",
+        "likes": "2,910",
+        "likesShort": "2.9K",
+        "comments": 156,
+        "shares": 312,
+        "caption": "Being next to you makes every single moment magical \ud83e\udd70 Your adorable smile is my daily dose of happiness \u2764\ufe0f <span class='hashtag'>#CuteMoments #LoveOfMyLife #ForeverTogether</span>",
+        "time": "22 sec ago"
+      },
+      {
+        "type": "image",
+        "username": "10.13_mine",
+        "audio": "Taylor Swift \u00b7 Lover",
+        "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/e0/db/47/e0db47b0-7f70-0631-0414-cd4777d2fb3e/mzaf_6362891154838442638.plus.aac.p.m4a",
+        "image": "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/post/04.webp",
+        "likes": "1,204",
+        "likesShort": "1.2K",
+        "comments": 43,
+        "shares": 98,
+        "caption": "Under the open sky with the one who holds my heart \ud83c\udf24\ufe0f Every place becomes romantic when I'm with you \ud83d\udc95 <span class='hashtag'>#RooftopDate #SkyFullOfLove #MyGirl</span>",
+        "time": "32 sec ago"
+      },
+      {
+        "type": "image",
+        "username": "subhankar.das_",
+        "audio": "Arijit Singh \u00b7 Tum Hi Ho",
+        "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/38/de/b9/38deb942-d44a-f2bb-205c-ddf05be84693/mzaf_9747647124859107103.plus.aac.p.m4a",
+        "image": "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/post/05.webp",
+        "likes": "3,150",
+        "likesShort": "3.2K",
+        "comments": 78,
+        "shares": 189,
+        "caption": "I can't help blushing whenever you look at me with so much love \ud83d\ude48 Your caring touch is the sweetest thing ever \ud83d\udc9e <span class='hashtag'>#ShyMoments #CandidLove #AdityMyLove</span>",
+        "time": "43 sec ago"
+      },
+      {
+        "type": "image",
+        "username": "Youknowsamael",
+        "audio": "Pritam, Arijit Singh \u00b7 Raabta",
+        "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/8c/0d/d5/8c0dd542-884d-423e-e7d9-f32f4fdc4219/mzaf_8521687348942687843.plus.aac.p.m4a",
+        "image": "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/post/06.webp",
+        "likes": "4,320",
+        "likesShort": "4.3K",
+        "comments": 112,
+        "shares": 245,
+        "caption": "Your face shines brighter than all the festive lights around us \ud83e\ude94\u2728 Evening outings with my absolute favorite person \u2764\ufe0f <span class='hashtag'>#FestiveVibes #PujaDiaries #CoupleGoals</span>",
+        "time": "1 min ago"
+      },
+      {
+        "type": "image",
+        "username": "subhankar0724",
+        "audio": "Mohit Chauhan \u00b7 Tum Se Hi",
+        "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/e7/39/b8/e739b870-54a1-8f33-57d5-3817108b8bd9/mzaf_16925921654959290990.plus.aac.p.m4a",
+        "image": "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/post/07.webp",
+        "likes": "982",
+        "likesShort": "982",
+        "comments": 38,
+        "shares": 76,
+        "caption": "Our silly jokes and goofy moments are what make us so special \ud83d\udc36\u2728 Always crazy and in love together! \ud83d\udc9e <span class='hashtag'>#SillyTogether #CuteFilter #LoveAndLaughter</span>",
+        "time": "2 mins ago"
+      },
+      {
+        "type": "image",
+        "username": "subhankar0724",
+        "audio": "Anuv Jain \u00b7 Baarishein",
+        "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/22/a0/7d/22a07d46-b904-0717-95da-ec335aac6407/mzaf_13582924850644616784.plus.aac.p.m4a",
+        "image": "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/post/08.webp",
+        "likes": "6,150",
+        "likesShort": "6.1K",
+        "comments": 184,
+        "shares": 412,
+        "caption": "Holding your hand like this is the greatest feeling in the entire world \ud83d\udc96 Spending festive nights with my queen \ud83d\udc78 <span class='hashtag'>#HoldingHands #FestiveLove #MyForeverLove</span>",
+        "time": "10 mins ago"
+      },
+      {
+        "type": "image",
+        "username": "10.13_mine",
+        "audio": "Jasleen Royal, B Praak \u00b7 Ranjha",
+        "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/56/65/9c/56659cff-c9d3-0c40-eca6-cdef3543b209/mzaf_1437769840194003232.plus.aac.p.m4a",
+        "image": "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/post/09.webp",
+        "likes": "2,410",
+        "likesShort": "2.4K",
+        "comments": 65,
+        "shares": 138,
+        "caption": "Sunny days and sweet garden dates with you \ud83c\udf3a\u2600\ufe0f Just one glance from you makes my whole day complete \ud83d\udc95 <span class='hashtag'>#GardenDate #SunnyVibes #MyGirl</span>",
+        "time": "32 mins ago"
+      },
+      {
+        "type": "image",
+        "username": "10.13_mine",
+        "audio": "Sonu Nigam, Shreya Ghoshal \u00b7 Main Agar Kahoon",
+        "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/6f/c6/6d/6fc66d9a-e830-b08a-ffe1-b67ed7d991e5/mzaf_5170129302151051752.plus.aac.p.m4a",
+        "image": "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/post/10.webp",
+        "likes": "18,450",
+        "likesShort": "18.4K",
+        "comments": 392,
+        "shares": 850,
+        "caption": "Matching in red and exploring nature hand in hand \ud83c\udf3f\u2764\ufe0f Every pathway looks beautiful with you by my side \u2728 <span class='hashtag'>#TwinInRed #NatureWalk #LoveAndLaughter</span>",
+        "time": "32 mins ago"
+      },
+      {
+        "type": "image",
+        "username": "subhankar.das_",
+        "audio": "Arijit Singh, Sachin-Jigar \u00b7 Apna Bana Le",
+        "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/eb/27/61/eb2761c7-d606-0912-dff0-2dc6b69974bd/mzaf_2023722930851223219.plus.aac.p.m4a",
+        "image": "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/post/11.webp",
+        "likes": "890",
+        "likesShort": "890",
+        "comments": 29,
+        "shares": 54,
+        "caption": "Whenever you gaze at me so lovingly, time stands completely still \ud83d\udc96 \u2728 <span class='hashtag'>#CuteMoments #Admiration #ShyMoments</span>",
+        "time": "32 mins ago"
+      },
+      {
+        "type": "image",
+        "username": "10.13_mine",
+        "audio": "Udit Narayan, Sadhana Sargam \u00b7 Pehla Nasha",
+        "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/44/c0/47/44c0470f-549d-9f96-1b06-beea0bd4a117/mzaf_8942075061405540109.plus.aac.p.m4a",
+        "image": "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/post/12.webp",
+        "likes": "5,730",
+        "likesShort": "5.7K",
+        "comments": 142,
+        "shares": 310,
+        "caption": "Holding you close in my arms makes me feel like I'm finally home \ud83c\udf3f Safe, warm, and endlessly in love \ud83d\udc9a <span class='hashtag'>#WarmHugs #AestheticCouple #LoveOfMyLife</span>",
+        "time": "32 mins ago"
+      },
+      {
+        "type": "image",
+        "username": "subhankar.das_",
+        "audio": "Pritam, Arijit Singh \u00b7 Shayad",
+        "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/69/08/d6/6908d60e-563f-5d07-9bb5-737c9d90b59d/mzaf_9263362903198979589.plus.aac.p.m4a",
+        "image": "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/post/13.webp",
+        "likes": "1,640",
+        "likesShort": "1.6K",
+        "comments": 51,
+        "shares": 105,
+        "caption": "Spending quiet, peaceful moments with you by the calm waters \ud83c\udf3e\ud83d\udc9a Pure peace is being wherever you are \ud83d\udc9e <span class='hashtag'>#VillageVibes #PeacefulLove #ForeverTogether</span>",
+        "time": "32 mins ago"
+      },
+      {
+        "type": "image",
+        "username": "subhankar0724",
+        "audio": "Akhil Sachdeva, Tulsi Kumar \u00b7 Tera Ban Jaunga",
+        "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/8e/b7/b9/8eb7b96b-ce3b-98b8-4ed9-c0c9aff20960/mzaf_13167890250017028075.plus.aac.p.m4a",
+        "image": "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/post/14.webp",
+        "likes": "8,920",
+        "likesShort": "8.9K",
+        "comments": 230,
+        "shares": 520,
+        "caption": "Cozy caf\u00e9 dates and endless deep talks with my heartbeat \u2615\ud83d\udc96 Your eyes have the calmest warmth \u2728 <span class='hashtag'>#CafeDates #HeartToHeart #CozyVibes</span>",
+        "time": "32 mins ago"
+      },
+      {
+        "type": "image",
+        "username": "subhankar0724",
+        "audio": "Arijit Singh, Harshdeep Kaur \u00b7 Zaalima",
+        "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/cd/9f/4a/cd9f4a3f-8f5d-922b-2db9-933751017f8f/mzaf_8736831722992033377.plus.aac.p.m4a",
+        "image": "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/post/15.webp",
+        "likes": "3,480",
+        "likesShort": "3.5K",
+        "comments": 94,
+        "shares": 198,
+        "caption": "Pinching your soft chubby cheeks is officially my favorite hobby \ud83e\udd0f\ud83e\udd70 Cute squishy moments with my love! \u2764\ufe0f <span class='hashtag'>#CheekyLove #SquishyCute #LoveAndLaughter</span>",
+        "time": "32 mins ago"
+      },
+      {
+        "type": "image",
+        "username": "Youknowsamael",
+        "audio": "Pritam, Arijit Singh \u00b7 Hawayein",
+        "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/15/d1/a8/15d1a862-edcd-6a92-624a-2bbf0f7eff26/mzaf_7165241817401822857.plus.aac.p.m4a",
+        "image": "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/post/16.webp",
+        "likes": "12,100",
+        "likesShort": "12.1K",
+        "comments": 286,
+        "shares": 640,
+        "caption": "Festival celebrations are never complete without holding your hand \u2728\u2764\ufe0f Every memory is priceless with you \ud83e\ude94 <span class='hashtag'>#PujaDiaries #FestiveVibes #TraditionalLove</span>",
+        "time": "32 mins ago"
+      },
+      {
+        "type": "image",
+        "username": "10.13_mine",
+        "audio": "A.R. Rahman, Arijit Singh \u00b7 Enna Sona",
+        "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/5b/b6/d7/5bb6d78f-1bba-c0a9-0731-d3286ed06914/mzaf_1092273590896407309.plus.aac.p.m4a",
+        "image": "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/post/17.webp",
+        "likes": "2,150",
+        "likesShort": "2.1K",
+        "comments": 73,
+        "shares": 162,
+        "caption": "Your cute little playful pout rules my heart completely \ud83d\udc8b\u2728 You never fail to bring a smile to my face! \ud83e\udd70 <span class='hashtag'>#CutePout #PlayfulLove #SillyTogether</span>",
+        "time": "32 mins ago"
+      },
+      {
+        "type": "image",
+        "username": "subhankar.das_",
+        "audio": "Atif Aslam, Sachin-Jigar \u00b7 Jeena Jeena",
+        "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/5a/ea/88/5aea88a0-6745-8c45-0b15-8eddf4710733/mzaf_1338041153962981679.plus.aac.p.m4a",
+        "image": "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/post/18.webp",
+        "likes": "7,840",
+        "likesShort": "7.8K",
+        "comments": 195,
+        "shares": 438,
+        "caption": "Golden sunlight on your face while I squish your cheeks \u2600\ufe0f\ud83e\udd0f Your cuteness is totally off the charts \u2764\ufe0f <span class='hashtag'>#SunKissedLove #CheekyLove #SunKissed</span>",
+        "time": "32 mins ago"
+      },
+      {
+        "type": "image",
+        "username": "subhankar0724",
+        "audio": "Divya Kumar, Priya Saraiya \u00b7 Sun Saathiya",
+        "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/6d/03/ab/6d03ab04-4a6f-8226-6e27-a4ae62ba5ddd/mzaf_17642184559836964492.plus.aac.p.m4a",
+        "image": "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/post/19.webp",
+        "likes": "945",
+        "likesShort": "945",
+        "comments": 34,
+        "shares": 81,
+        "caption": "Listening to your sweet laughter under the warm afternoon sun \u2600\ufe0f\ud83e\udd42 Pure magic in every single second \ud83d\udc9e <span class='hashtag'>#CandidLove #RooftopDate #SunKissed</span>",
+        "time": "32 mins ago"
+      },
+      {
+        "type": "image",
+        "username": "subhankar0724",
+        "audio": "Arijit Singh, Shreya Ghoshal \u00b7 Samjhawan",
+        "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/65/06/39/65063981-71d1-0ac9-27a8-3d5d4aaae812/mzaf_10463263695656246233.plus.aac.p.m4a",
+        "image": "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/post/20.webp",
+        "likes": "4,120",
+        "likesShort": "4.1K",
+        "comments": 118,
+        "shares": 275,
+        "caption": "Promise me you will hold my hand forever just like this \ud83e\udd1d\u2728 Every gentle touch reminds me how blessed I am \u2764\ufe0f <span class='hashtag'>#HoldingHands #WarmHugs #HeartToHeart</span>",
+        "time": "32 mins ago"
+      },
+      {
+        "type": "image",
+        "username": "Youknowsamael",
+        "audio": "Vishal Mishra \u00b7 Kaise Hua",
+        "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/14/d3/52/14d3523c-00d0-e1b8-231a-4bfaf4767eac/mzaf_11751897198375558437.plus.aac.p.m4a",
+        "image": "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/post/21.webp",
+        "likes": "15,600",
+        "likesShort": "15.6K",
+        "comments": 340,
+        "shares": 790,
+        "caption": "Sitting side by side, holding hands and dreaming of a beautiful future \ud83e\ude9f\u2728 You mean the entire world to me \ud83d\udc96 <span class='hashtag'>#GlasshouseVibes #FutureTogether #SkyFullOfLove</span>",
+        "time": "32 mins ago"
+      },
+      {
+        "type": "image",
+        "username": "10.13_mine",
+        "audio": "Jasleen Royal, Arijit Singh \u00b7 Heeriye",
+        "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/14/9b/ac/149bac62-12f1-2f55-a742-f38429b94c83/mzaf_17225240189976438593.plus.aac.p.m4a",
+        "image": "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/post/22.webp",
+        "likes": "3,890",
+        "likesShort": "3.9K",
+        "comments": 104,
+        "shares": 226,
+        "caption": "I could sit here forever just listening to your lovely stories \u2615\ud83d\udcad Dates with my forever crush \ud83d\udc95 <span class='hashtag'>#CafeDates #CozyVibes #FutureTogether</span>",
+        "time": "32 mins ago"
+      },
+      {
+        "type": "image",
+        "username": "subhankar.das_",
+        "audio": "King \u00b7 Maan Meri Jaan",
+        "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview116/v4/08/88/dc/0888dc54-64eb-d0c5-f33a-4a0522fdc07c/mzaf_529871923278566290.plus.aac.p.m4a",
+        "image": "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/post/23.webp",
+        "likes": "1,290",
+        "likesShort": "1.3K",
+        "comments": 48,
+        "shares": 114,
+        "caption": "Arm around your shoulder, after somethings special \ud83d\ude0b <span class='hashtag'>#SunKissed #SkyFullOfLove #SunKissedLove</span>",
+        "time": "32 min ago"
+      },
+      {
+        "type": "image",
+        "username": "subhankar.das_",
+        "audio": "Anirudh, Arijit Singh \u00b7 Chaleya",
+        "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/55/fb/9c/55fb9c31-320a-5dba-0a3f-5e69552085a7/mzaf_13508224660474474886.plus.aac.p.m4a",
+        "image": "https://raw.githubusercontent.com/subhankardas68922/assets/main/assets/post/24.webp",
+        "likes": "6,420",
+        "likesShort": "6.4K",
+        "comments": 168,
+        "shares": 380,
+        "caption": "Stunning city skyline behind us, but my eyes are only locked on you \ud83c\udfd9\ufe0f\u2728 You are my absolute favorite view \u2764\ufe0f <span class='hashtag'>#RooftopDate #MyForeverLove #AestheticCouple</span>",
+        "time": "32 min ago"
+      }
+    ];
+
+    postsData.forEach(item => {
+      item.avatar = getAvatarForUser(item.username);
+    });
+
+    // --- DYNAMIC POST RENDERING ---
+    const feed = document.getElementById("feed");
+    const loader = document.getElementById("feedLoader");
+    let loadedPostCount = 0;
+    const BATCH_SIZE = 3;
+
+    function createCardHTML(post) {
+      return `
+        <div class="post-card">
+          <span class="deco-heart" style="top: 15px; left: 15px; font-size: 18px;">💖</span>
+          <span class="deco-heart" style="top: 15px; right: 15px; font-size: 20px;">💖</span>
+          <span class="deco-heart" style="top: 50%; left: 10px; font-size: 22px;">💖</span>
+          <span class="deco-heart" style="top: 55%; right: 12px; font-size: 14px;">💖</span>
+
+          <div class="card-title-header">
+            <div class="card-subhead">Happy</div>
+            <div class="card-main-title">Girl Friend Day,</div>
+            <div class="card-main-title">Adity <span style="font-size: 28px;">💘</span></div>
+          </div>
+
+          <div class="card-body">
+            <p>You are not just my girlfriend, you are my <span class="highlight">favorite person</span>, my peace, my biggest smile, and the sweetest part of my every day. 🌸</p>
+            <div class="divider"><span>❤</span></div>
+            <p>No matter how busy life gets, talking to you always makes everything feel better. Thank you for being <span class="highlight">cute</span>, <span class="highlight">caring</span>, <span class="highlight">annoying</span> sometimes 😜, and perfectly <span class="highlight">you</span>.</p>
+            <div class="divider"><span>❤</span></div>
+            <p>I feel lucky that I have someone as <span class="highlight">special</span> as you in my life. May your smile always stay this beautiful, and may we keep creating countless <span class="highlight">lovely memories</span> together. ✨</p>
+          </div>
+
+          <svg class="floral-left" viewBox="0 0 100 100" fill="#e91e63"><path d="M10,90 Q30,50 50,80 T90,20 C70,40 50,30 10,90 Z"/></svg>
+          <svg class="floral-right" viewBox="0 0 100 100" fill="#e91e63"><path d="M10,90 Q30,50 50,80 T90,20 C70,40 50,30 10,90 Z"/></svg>
+        </div>
+      `;
+    }
+
+    function renderPostBatch() {
+      const nextBatch = [];
+      for (let i = 0; i < BATCH_SIZE; i++) {
+        const postIndex = (loadedPostCount + i) % postsData.length;
+        nextBatch.push(postsData[postIndex]);
+      }
+
+      nextBatch.forEach((post) => {
+        const article = document.createElement("article");
+        article.className = "post";
+        if (post.audioSrc) {
+          article.dataset.audioSrc = post.audioSrc;
+        }
+
+        const mediaHTML = post.type === "card"
+          ? createCardHTML(post)
+          : `<img class="post-img" src="${post.image}" alt="Post image" loading="lazy" />`;
+
+        const audioBtnHTML = post.audioSrc ? `
+            <button class="post-audio-btn" aria-label="Toggle audio" onclick="event.stopPropagation(); togglePostAudio(this);">
+              <svg aria-label="Audio is muted" class="audio-icon-muted x1lliihq x1n2onr6 xq3z1fi" fill="currentColor" height="12" role="img" viewBox="0 0 48 48" width="12">
+                <title>Audio is muted</title>
+                <path clip-rule="evenodd" d="M1.5 13.3c-.8 0-1.5.7-1.5 1.5v18.4c0 .8.7 1.5 1.5 1.5h8.7l12.9 12.9c.9.9 2.5.3 2.5-1v-9.8c0-.4-.2-.8-.4-1.1l-22-22c-.3-.3-.7-.4-1.1-.4h-.6zm46.8 31.4-5.5-5.5C44.9 36.6 48 31.4 48 24c0-11.4-7.2-17.4-7.2-17.4-.6-.6-1.6-.6-2.2 0L37.2 8c-.6.6-.6 1.6 0 2.2 0 0 5.7 5 5.7 13.8 0 5.4-2.1 9.3-3.8 11.6L35.5 32c1.1-1.7 2.3-4.4 2.3-8 0-6.8-4.1-10.3-4.1-10.3-.6-.6-1.6-.6-2.2 0l-1.4 1.4c-.6.6-.6 1.6 0 2.2 0 0 2.6 2 2.6 6.7 0 1.8-.4 3.2-.9 4.3L25.5 22V1.4c0-1.3-1.6-1.9-2.5-1L13.5 10 3.3-.3c-.6-.6-1.5-.6-2.1 0L-.2 1.1c-.6.6-.6 1.5 0 2.1L4 7.6l26.8 26.8 13.9 13.9c.6.6 1.5.6 2.1 0l1.4-1.4c.7-.6.7-1.6.1-2.2z" fill-rule="evenodd"></path>
+              </svg>
+              <svg aria-label="Audio is playing" class="audio-icon-playing x1lliihq x1n2onr6 xq3z1fi" fill="currentColor" height="12" role="img" viewBox="0 0 24 24" width="12" style="display: none;">
+                <title>Audio is playing</title>
+                <path clip-rule="evenodd" d="M16.636 7.028a1.5 1.5 0 10-2.395 1.807 5.365 5.365 0 011.103 3.17 5.378 5.378 0 01-1.105 3.176 1.5 1.5 0 102.395 1.806 8.396 8.396 0 001.71-4.981 8.39 8.39 0 00-1.708-4.978zm3.73-2.332A1.5 1.5 0 1018.04 6.59 8.823 8.823 0 0120 12.007a8.798 8.798 0 01-1.96 5.415 1.5 1.5 0 002.326 1.894 11.672 11.672 0 002.635-7.31 11.682 11.682 0 00-2.635-7.31zm-8.963-3.613a1.001 1.001 0 00-1.082.187L5.265 6H2a1 1 0 00-1 1v10.003a1 1 0 001 1h3.265l5.01 4.682.02.021a1 1 0 001.704-.814L12.005 2a1 1 0 00-.602-.917z" fill-rule="evenodd"></path>
+              </svg>
+            </button>
+        ` : '';
+
+        article.innerHTML = `
+          <div class="post-header">
+            <div class="post-user-info">
+              <div class="post-avatar-ring">
+                <img class="post-avatar" src="${post.avatar}" alt="${post.username}" />
+              </div>
+              <div class="post-details">
+                <span class="post-username">${post.username}</span>
+                <span class="post-audio" style="cursor: pointer;" onclick="event.stopPropagation(); const btn = this.closest('.post').querySelector('.post-audio-btn'); if (btn) togglePostAudio(btn);">
+                  <svg version="1.0" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 600.000000 580.000000" preserveAspectRatio="xMidYMid meet"><g transform="translate(0.000000,580.000000) scale(0.050000,-0.050000)" fill="currentColor" stroke="none"><path d="M9050 9958 c-77 -22 -603 -174 -1170 -338 -1203 -348 -3566 -1027 -3774 -1084 -95 -27 -170 -62 -222 -107 -155 -133 -144 27 -144 -2179 0 -1873 -2 -1973 -35 -1959 -1342 583 -2588 -1087 -1592 -2131 746 -783 2089 -448 2410 600 l46 150 6 1975 c4 1086 10 1975 15 1975 4 0 906 189 2004 420 1098 231 2021 425 2051 432 l55 11 0 -1461 c0 -804 -2 -1462 -5 -1462 -3 0 -70 22 -150 50 -1282 434 -2392 -1054 -1559 -2091 718 -896 2228 -542 2514 589 47 185 64 6305 19 6426 -69 181 -241 248 -469 184z"/></g></svg>
+                  ${post.audio}
+                </span>
+              </div>
+            </div>
+
+            <svg width="22" height="22" viewBox="0 0 26 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="8" x2="23" y2="8" stroke-linecap="round"></line><line x1="3" y1="16" x2="16.5" y2="16" stroke-linecap="round"></line></svg>
+          </div>
+
+          <div class="post-media-container" onclick="handlePostTap(this)" ondblclick="handlePostDoubleTap(this)">
+            ${mediaHTML}
+            <div class="double-tap-heart">
+              <svg viewBox="0 0 24 24" width="86" height="86" fill="#ffffff">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+              </svg>
+            </div>
+            ${audioBtnHTML}
+          </div>
+
+          <div class="post-actions">
+            <div class="action-group">
+              <div class="action-item" onclick="toggleLike(this.querySelector('.like-btn'))">
+                <svg class="action-icon like-btn" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M16.792 3.904A4.989 4.989 0 0 1 21.5 9.122c0 3.072-2.652 4.959-5.197 7.222-2.512 2.243-3.865 3.469-4.303 3.752-.477-.309-2.143-1.823-4.303-3.752C5.141 14.072 2.5 12.167 2.5 9.122a4.989 4.989 0 0 1 4.708-5.218 4.21 4.21 0 0 1 3.675 1.941c.84 1.175.98 1.763 1.12 1.763s.278-.588 1.11-1.766a4.17 4.17 0 0 1 3.679-1.938m0-2a6.04 6.04 0 0 0-4.797 2.127 6.052 6.052 0 0 0-4.787-2.127A6.985 6.985 0 0 0 .5 9.122c0 3.61 2.55 5.827 5.015 7.97.283.246.569.494.853.747l1.027.918a44.998 44.998 0 0 0 3.518 3.018 2 2 0 0 0 2.174 0 45.263 45.263 0 0 0 3.626-3.115l.922-.824c.293-.26.59-.519.885-.774 2.334-2.025 4.98-4.32 4.98-7.94a6.985 6.985 0 0 0-6.708-7.218Z"></path></svg>
+                <span class="action-count">${post.likesShort || post.likes}</span>
+              </div>
+              <div class="action-item">
+                <svg class="action-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.656 17.008a9.993 9.993 0 1 0-3.59 3.615L22 22Z"></path></svg>
+                <span class="action-count">${post.comments || Math.floor(Math.random() * 100) + 1}</span>
+              </div>
+              <svg class="action-icon" aria-label="Share" width="24" height="24" viewBox="0 0 24 24" role="img" style="cursor: pointer;" onclick="window.location.href='direct.html'"><path d="M13.973 20.046 21.77 6.928C22.8 5.195 21.55 3 19.535 3H4.466C2.138 3 .984 5.825 2.646 7.456l4.842 4.752 1.723 7.121c.548 2.266 3.571 2.721 4.762.717Z" fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="2"></path><line fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="7.488" x2="15.515" y1="12.208" y2="7.641"></line></svg>
+            </div>
+            <svg class="action-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon fill="none" points="20 21 12 13.44 4 21 4 3 20 3 20 21" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></polygon></svg>
+          </div>
+
+          <div class="post-caption-box">
+            <span class="caption-username">${post.username}</span>
+            ${post.caption}
+          </div>
+          <div class="post-time">${post.time}</div>
+        `;
+
+        feed.insertBefore(article, loader);
+      });
+
+      loadedPostCount += BATCH_SIZE;
+    }
+
+
+    // --- GLOBAL POST FEED AUDIO CONTROLLER ---
+    let currentFeedAudio = null;
+    let currentActiveAudioBtn = null;
+
+    function stopAllFeedAudio() {
+      if (currentFeedAudio) {
+        currentFeedAudio.pause();
+        currentFeedAudio.currentTime = 0;
+        currentFeedAudio = null;
+      }
+      if (currentActiveAudioBtn) {
+        const mutedIcon = currentActiveAudioBtn.querySelector('.audio-icon-muted');
+        const playingIcon = currentActiveAudioBtn.querySelector('.audio-icon-playing');
+        if (mutedIcon) mutedIcon.style.display = 'block';
+        if (playingIcon) playingIcon.style.display = 'none';
+        currentActiveAudioBtn.classList.remove('playing');
+        currentActiveAudioBtn = null;
+      }
+      document.querySelectorAll('.post-audio-btn').forEach(btn => {
+        btn.classList.remove('playing');
+        const m = btn.querySelector('.audio-icon-muted');
+        const p = btn.querySelector('.audio-icon-playing');
+        if (m) m.style.display = 'block';
+        if (p) p.style.display = 'none';
+      });
+    }
+
+    function togglePostAudio(btn) {
+      const article = btn.closest('.post');
+      const audioSrc = article ? article.dataset.audioSrc : null;
+      if (!audioSrc) return;
+
+      // If clicked button is already playing, mute it
+      if (currentActiveAudioBtn === btn && currentFeedAudio && !currentFeedAudio.paused) {
+        stopAllFeedAudio();
+        return;
+      }
+
+      // Mutual exclusion: stop everything else first
+      stopAllFeedAudio();
+
+      // Start playing new audio
+      const audio = new Audio(audioSrc);
+      audio.volume = 1.0;
+      currentFeedAudio = audio;
+      currentActiveAudioBtn = btn;
+
+      const mutedIcon = btn.querySelector('.audio-icon-muted');
+      const playingIcon = btn.querySelector('.audio-icon-playing');
+      if (mutedIcon) mutedIcon.style.display = 'none';
+      if (playingIcon) playingIcon.style.display = 'block';
+      btn.classList.add('playing');
+
+      audio.play().catch(err => {
+        console.warn('Audio playback prevented or failed:', err);
+        stopAllFeedAudio();
+      });
+
+      audio.onended = () => {
+        stopAllFeedAudio();
+      };
+    }
+
+    function triggerDoubleTapHeart(mediaContainer) {
+      const heart = mediaContainer.querySelector('.double-tap-heart');
+      if (!heart) return;
+
+      heart.classList.remove('animate-heart');
+      void heart.offsetWidth; // Force reflow
+      heart.classList.add('animate-heart');
+
+      const postArticle = mediaContainer.closest('.post');
+      if (postArticle) {
+        const likeBtn = postArticle.querySelector('.like-btn');
+        if (likeBtn && !likeBtn.classList.contains('liked')) {
+          setLikeState(likeBtn, true);
+        }
+      }
+    }
+
+    let lastTapTime = 0;
+    let lastTapContainer = null;
+
+    function handlePostTap(container) {
+      const now = Date.now();
+      if (lastTapContainer === container && (now - lastTapTime) < 320) {
+        triggerDoubleTapHeart(container);
+        lastTapTime = 0;
+        lastTapContainer = null;
+      } else {
+        lastTapTime = now;
+        lastTapContainer = container;
+      }
+    }
+
+    function handlePostDoubleTap(container) {
+      triggerDoubleTapHeart(container);
+    }
+
+    function setLikeState(btn, shouldLike) {
+      if (shouldLike) {
+        btn.classList.add("liked");
+        btn.innerHTML = FILLED_HEART_PATH;
+      } else {
+        btn.classList.remove("liked");
+        btn.innerHTML = OUTLINE_HEART_PATH;
+      }
+    }
+
+    function toggleLike(btn) {
+      const isLiked = btn.classList.contains("liked");
+      setLikeState(btn, !isLiked);
+    }
+
+    // --- INFINITE SCROLL OBSERVER ---
+    const observerOptions = {
+      root: feed,
+      threshold: 0.1
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          setTimeout(() => {
+            renderPostBatch();
+          }, 350);
+        }
+      });
+    }, observerOptions);
+
+    renderPostBatch();
+    observer.observe(loader);
+
+    // --- SMOOTH HEADER HIDE / SHOW ON SCROLL ---
+    const topBar = document.querySelector('.top-bar');
+    let lastScrollY = feed.scrollTop;
+
+    feed.addEventListener('scroll', () => {
+      const currentScrollY = feed.scrollTop;
+
+      if (currentScrollY > lastScrollY && currentScrollY > 40) {
+        // Scrolling down past threshold -> smooth slide out
+        topBar.classList.add('hide-header');
+      } else if (currentScrollY < lastScrollY) {
+        // Scrolling up -> smooth slide back in
+        topBar.classList.remove('hide-header');
+      }
+
+      lastScrollY = currentScrollY;
+    }, { passive: true });
+
+    // ─── Android Hardware Back Button Fix ───────────────────────────────────
+    // Push a dummy state so Android back doesn't instantly exit the browser/app
+    history.pushState({ page: 'feed' }, '', window.location.href);
+
+    window.addEventListener('popstate', function () {
+      // Check if any modal/overlay is open first and close it
+      const activeModal = document.querySelector('.modal.active, .sheet.active, [class*="modal"].active');
+      if (activeModal) {
+        activeModal.classList.remove('active');
+        history.pushState({ page: 'feed' }, '', window.location.href);
+      } else {
+        // No modal open — stay on page, re-push state
+        history.pushState({ page: 'feed' }, '', window.location.href);
+      }
+    });
+  </script>
+</body>
+
+</html>
